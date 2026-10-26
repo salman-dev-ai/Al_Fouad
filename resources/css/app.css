@@ -1,9 +1,51 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/cairo';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+/* Tailwind v4 يفحص الملفات تلقائيًا؛ هذه المسارات للتأكيد */
+@source '../views/**/*.blade.php';
+@source '../../app/Livewire/**/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    /* ألوان العلامة: مصدر واحد لا تُكتب الألوان يدويًا في القوالب */
+    --color-brand-50: #F0F9ED;
+    --color-brand-500: #4DA743;
+    --color-brand-600: #3E8D35;
+    --color-brand-700: #2F6F28;
+
+    --color-ink: #1F2937;
+    --color-ink-soft: #4B5563;
+    --color-surface: #F3F4F6;
+    --color-line: #E5E7EB;
+    --color-danger: #DC2626;
+
+    --font-sans: 'Cairo Variable', ui-sans-serif, system-ui, 'Segoe UI', Tahoma, sans-serif;
+
+    /* زوايا حادة قليلًا لتناسب حروف الشعار */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+}
+
+@layer base {
+    html {
+        font-family: var(--font-sans);
+        color: var(--color-ink);
+        background: #fff;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        min-height: 100dvh;
+        line-height: 1.7;
+    }
+
+    h1, h2, h3 {
+        font-weight: 800;
+        line-height: 1.3;
+    }
+
+    :focus-visible {
+        outline: 3px solid var(--color-brand-500);
+        outline-offset: 2px;
+    }
 }
