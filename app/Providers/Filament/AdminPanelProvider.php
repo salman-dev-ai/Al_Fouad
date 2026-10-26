@@ -66,8 +66,8 @@ class AdminPanelProvider extends PanelProvider
                 for: 'App\\Filament\\Widgets',
             )
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+                // AccountWidget::class,
+                // FilamentInfoWidget::class,
             ])
 
             // HTTP middleware.

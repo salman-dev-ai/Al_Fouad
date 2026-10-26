@@ -2,7 +2,10 @@
 
 namespace App\Enums;
 
-enum OrderStatus: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum OrderStatus: string implements HasColor, HasLabel
 {
     case Pending = 'pending';
     case Confirmed = 'confirmed';
@@ -10,7 +13,7 @@ enum OrderStatus: string
     case Delivered = 'delivered';
     case Cancelled = 'cancelled';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::Pending => 'قيد الانتظار',
@@ -21,9 +24,18 @@ enum OrderStatus: string
         };
     }
 
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::Pending => 'warning',
+            self::Confirmed => 'info',
+            self::Shipped => 'primary',
+            self::Delivered => 'success',
+            self::Cancelled => 'danger',
+        };
+    }
+
     /**
-     * الحالات التي يُسمح بالانتقال إليها من الحالة الحالية.
-     *
      * @return array<int, self>
      */
     public function allowedTransitions(): array

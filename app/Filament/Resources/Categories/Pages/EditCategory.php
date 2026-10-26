@@ -14,7 +14,8 @@ class EditCategory extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-DeleteAction::make()
-    ->hidden(fn (Category $record): bool => $record->products()->exists()),        ];
+            DeleteAction::make(),
+                // ->hidden(fn(Category $record): bool => $record->products()->exists()),
+        ];
     }
 }
