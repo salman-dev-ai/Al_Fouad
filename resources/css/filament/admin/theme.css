@@ -1,0 +1,75 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+
+/* Al Fouad - Admin Theme */
+
+:root {
+    --af-brand: #4DA743;
+    --af-brand-dark: #347A2E;
+    --af-surface: #FFFFFF;
+    --af-background: #F7FAF6;
+    --af-border: #E1E8DE;
+    --af-text: #253124;
+}
+
+/* Light mode surfaces */
+.fi-body {
+    background-color: var(--af-background);
+}
+
+/* Sidebar */
+.fi-sidebar {
+    background-color: var(--af-surface);
+    border-inline-end: 1px solid var(--af-border);
+}
+
+/* Brand logo */
+.fi-logo {
+    max-height: 3.5rem;
+    width: auto;
+    object-fit: contain;
+    border-radius: 0.5rem;
+    margin: 0.5rem;
+
+
+}
+
+/* Main content cards */
+.fi-section,
+.fi-wi,
+.fi-ta-ctn {
+    border-color: var(--af-border);
+}
+
+/* Primary buttons */
+.fi-btn-color-primary {
+    transition:
+        background-color 180ms ease,
+        box-shadow 180ms ease;
+}
+
+/* Keyboard accessibility */
+.fi-btn:focus-visible,
+.fi-input-wrp:focus-within {
+    outline-color: var(--af-brand);
+}
+
+/* Dark mode */
+.dark {
+    --af-surface: #0c130c;
+    --af-background: #101710;
+    --af-border: #303D2F;
+    --af-text: #E7EFE4;
+}
+
+.dark .fi-body {
+    background-color: var(--af-background);
+}
+
+.dark .fi-sidebar {
+    background-color: var(--af-surface);
+    border-inline-end-color: var(--af-border);
+}
