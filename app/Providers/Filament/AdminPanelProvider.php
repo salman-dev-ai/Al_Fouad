@@ -42,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
 
             // Brand identity.
             ->brandName('الفؤاد | لوحة الإدارة')
+            ->favicon(asset('favicon.svg'))
             ->brandLogo(asset('images/logo.webp'))
             ->brandLogoHeight('3.5rem')
 
@@ -83,7 +84,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                Authenticate::class, 
             ])
 
             // Custom theme compiled by Vite.

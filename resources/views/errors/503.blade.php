@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('title', 'المتجر تحت الصيانة')
+@section('code', '503')
+@section('heading', 'نجهّز المتجر لأجلك')
+@section('message', 'المتجر مغلق مؤقتًا للصيانة، وسنعود قريبًا. شكرًا لصبرك.')

@@ -3,7 +3,6 @@
 namespace App\View\Components\Store;
 
 use App\Models\StoreSetting;
-use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
@@ -69,7 +68,7 @@ class Footer extends Component
             ->all();
     }
 
-    public function render(): View|Closure|string
+    public function render(): View|\Closure|string
     {
         return view('components.store.footer');
     }

@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Products\Schemas;
 
-use Closure;
+use App\Models\ProductVariant;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 
 class ProductForm
 {
-    public const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Free Size'];
+    public const SIZES = ProductVariant::SIZES;
 
     public static function configure(Schema $schema): Schema
     {
@@ -118,7 +118,7 @@ class ProductForm
                                 ? trim(($state['size'] ?? '') . ' - ' . ($state['color'] ?? ''))
                                 : null)
                             ->rules([
-                                fn (): Closure => function (string $attribute, $value, Closure $fail): void {
+                                fn (): \Closure => function (string $attribute, $value, \Closure $fail): void {
                                     $keys = collect($value)->map(fn ($v) => mb_strtolower(trim(($v['size'] ?? '') . '|' . ($v['color'] ?? ''))));
 
                                     if ($keys->count() !== $keys->unique()->count()) {

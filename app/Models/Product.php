@@ -49,6 +49,10 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
+
+
+
+
     /**
      * الألوان المتاحة مستنتجة من الخيارات. حمّل العلاقة variants مسبقًا
      * (with('variants')) لتجنب استعلامات إضافية.
@@ -71,5 +75,31 @@ class Product extends Model
     public function scopeFeatured(Builder $query): void
     {
         $query->where('is_featured', true);
+    }
+
+
+
+        /** أرخص خيار. يتطلب تحميل variants مسبقًا لتجنب N+1. */
+    public function cheapestVariant(): ?ProductVariant
+    {
+        return $this->variants
+            ->sortBy(fn (ProductVariant $variant): float => (float) $variant->price)
+            ->first();
+    }
+
+    /** الصورة الرئيسية، وإن لم تُحدَّد فأولى الصور. يتطلب تحميل images مسبقًا. */
+    protected function mainImage(): Attribute
+    {
+        return Attribute::get(
+            fn (): ?ProductImage => $this->images->firstWhere('is_primary', true) ?? $this->images->first()
+        );
+    }
+
+    /** هل يتوفر أي خيار؟ يتطلب تحميل variants مسبقًا. */
+    protected function inStock(): Attribute
+    {
+        return Attribute::get(
+            fn (): bool => $this->variants->contains(fn (ProductVariant $variant): bool => $variant->stock_quantity > 0)
+        );
     }
 }

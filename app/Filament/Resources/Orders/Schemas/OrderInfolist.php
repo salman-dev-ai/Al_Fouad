@@ -32,9 +32,23 @@ class OrderInfolist
                     ->columns(2)
                     ->schema([
                         TextEntry::make('customer_name')->label('الاسم'),
-                        TextEntry::make('customer_phone')->label('الهاتف')->copyable(),
+
+                        TextEntry::make('customer_phone')
+                            ->label('الهاتف')
+                            ->copyable()
+                            ->url(fn(string $state): string => 'https://wa.me/' . ltrim($state, '+'), shouldOpenInNewTab: true),
+
                         TextEntry::make('city')->label('المدينة')->placeholder('—'),
                         TextEntry::make('delivery_address')->label('عنوان التوصيل'),
+                        TextEntry::make('payment_method')
+                            ->label('طريقة الدفع')
+                            ->badge(),
+
+                        TextEntry::make('location_url')
+                            ->label('موقع العميل')
+                            ->placeholder('لم يحدده')
+                            ->limit(50)
+                            ->url(fn(?string $state): ?string => $state, shouldOpenInNewTab: true),
                         TextEntry::make('notes')->label('ملاحظات')->placeholder('لا توجد')->columnSpanFull(),
                     ]),
 

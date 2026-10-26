@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\StoreSetting;
+use App\Support\PhoneNumber;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -72,8 +73,18 @@ class ManageStoreSettings extends Page
                         ->columns(2)
                         ->schema([
                             self::phoneField('phone', 'رقم هاتف المحل'),
-                            self::phoneField('whatsapp_phone', 'رقم واتساب')
-                                ->helperText('بالصيغة الدولية، مثل +967777123456.'),
+                            TextInput::make('whatsapp_phone')
+                                ->label('رقم واتساب')
+                                ->tel()
+                                ->maxLength(30)
+                                ->rules([
+                                    fn(): \Closure => function (string $attribute, mixed $value, \Closure $fail): void {
+                                        if (filled($value) && PhoneNumber::normalize((string) $value, config('store.default_country_code')) === null) {
+                                            $fail('أدخل رقم واتساب صحيحًا، مثل 777123456 أو +967777123456.');
+                                        }
+                                    },
+                                ])
+                                ->helperText('يستقبل طلبات العملاء. يُحفظ بصيغة دولية تلقائيًا (+967...).'),
                             TextInput::make('email')
                                 ->label('البريد الإلكتروني')
                                 ->email()
@@ -119,8 +130,8 @@ class ManageStoreSettings extends Page
                                 ->numeric()
                                 ->minValue(0)
                                 ->maxValue(100)
-                                ->visible(fn ($get): bool => (bool) $get('tax_enabled'))
-                                ->required(fn ($get): bool => (bool) $get('tax_enabled')),
+                                ->visible(fn($get): bool => (bool) $get('tax_enabled'))
+                                ->required(fn($get): bool => (bool) $get('tax_enabled')),
                         ]),
 
                     Section::make('أوقات العمل')
@@ -142,13 +153,13 @@ class ManageStoreSettings extends Page
                                     TimePicker::make('opens_at')
                                         ->label('يفتح')
                                         ->seconds(false)
-                                        ->hidden(fn ($get): bool => (bool) $get('is_closed'))
-                                        ->required(fn ($get): bool => ! $get('is_closed')),
+                                        ->hidden(fn($get): bool => (bool) $get('is_closed'))
+                                        ->required(fn($get): bool => ! $get('is_closed')),
                                     TimePicker::make('closes_at')
                                         ->label('يغلق')
                                         ->seconds(false)
-                                        ->hidden(fn ($get): bool => (bool) $get('is_closed'))
-                                        ->required(fn ($get): bool => ! $get('is_closed')),
+                                        ->hidden(fn($get): bool => (bool) $get('is_closed'))
+                                        ->required(fn($get): bool => ! $get('is_closed')),
                                 ]),
                         ]),
 
@@ -173,7 +184,7 @@ class ManageStoreSettings extends Page
                             TextInput::make('announcement_text')
                                 ->label('نص الإعلان')
                                 ->maxLength(255)
-                                ->required(fn ($get): bool => (bool) $get('announcement_enabled')),
+                                ->required(fn($get): bool => (bool) $get('announcement_enabled')),
                             Toggle::make('maintenance_mode')
                                 ->label('وضع الصيانة (إيقاف المتجر مؤقتًا)')
                                 ->helperText('يغلق المتجر أمام الزبائن، وتبقى لوحة الإدارة متاحة.')
@@ -201,14 +212,13 @@ class ManageStoreSettings extends Page
         $data = $this->form->getState();
 
         $data['phone'] = self::normalizePhone($data['phone'] ?? null);
-        $data['whatsapp_phone'] = self::normalizePhone($data['whatsapp_phone'] ?? null);
-
+        $data['whatsapp_phone'] = PhoneNumber::normalize($data['whatsapp_phone'] ?? null, config('store.default_country_code'));
         if (! ($data['tax_enabled'] ?? false)) {
             $data['tax_rate'] = 0;
         }
 
         $data['opening_hours'] = array_values($data['opening_hours'] ?? []);
-        $data['social_links'] = array_filter($data['social_links'] ?? [], fn ($url): bool => filled($url));
+        $data['social_links'] = array_filter($data['social_links'] ?? [], fn($url): bool => filled($url));
 
         $record = $this->getRecord() ?? new StoreSetting();
         $record->fill($data);
@@ -256,7 +266,7 @@ class ManageStoreSettings extends Page
     private static function defaultHours(): array
     {
         return collect(['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'])
-            ->map(fn (string $day): array => [
+            ->map(fn(string $day): array => [
                 'day' => $day,
                 'is_closed' => $day === 'الجمعة',
                 'opens_at' => '09:00',

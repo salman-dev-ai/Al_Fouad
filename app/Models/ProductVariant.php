@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductVariant extends Model
 {
+
+    /** قائمة المقاسات المعتمدة وترتيب عرضها. المصدر الوحيد للمتجر وللوحة الإدارة. */
+    public const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Free Size'];
     protected $fillable = [
         'product_id',
         'size',
