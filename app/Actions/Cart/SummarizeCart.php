@@ -51,8 +51,16 @@ class SummarizeCart
         // نسبة الضريبة بالنقاط الأساسية (5.00% => 500)، والتقريب لأقرب وحدة صغرى بأعداد صحيحة
         $taxMinor = $taxEnabled ? intdiv($subtotal * Money::toMinor($taxRate) + 5000, 10000) : 0;
 
-        $deliveryFee = $lines === [] ? 0 : Money::toMinor($settings?->delivery_fee ?? 0);
-
+        // حد الشحن المجاني: يُقارن بمجموع المنتجات قبل الضريبة، وبأعداد صحيحة فقط.
+        // إن كانت رسوم التوصيل صفرًا أصلًا أو الحد غير مضبوط نلغي الشريط (threshold = null).
+        // إن بلغ المجموع الحد صارت رسوم التوصيل صفرًا، وهذا الحساب نفسه يستعمله PlaceOrder.
+        $baseDelivery = $lines === [] ? 0 : Money::toMinor($settings?->delivery_fee ?? 0);
+        $rawThreshold = $settings?->free_shipping_threshold;
+        $threshold = ($rawThreshold !== null && $baseDelivery > 0 && Money::toMinor($rawThreshold) > 0)
+            ? Money::toMinor($rawThreshold)
+            : null;
+        $remaining = $threshold === null ? 0 : max(0, $threshold - $subtotal);
+        $deliveryFee = ($threshold !== null && $remaining === 0) ? 0 : $baseDelivery;
         return new CartSummary(
             lines: $lines,
             subtotalMinor: $subtotal,
@@ -61,6 +69,9 @@ class SummarizeCart
             taxMinor: $taxMinor,
             deliveryFeeMinor: $deliveryFee,
             totalMinor: $subtotal + $taxMinor + $deliveryFee,
+              freeShippingThresholdMinor: $threshold,
+            freeShippingRemainingMinor: $remaining,
+
         );
     }
 }

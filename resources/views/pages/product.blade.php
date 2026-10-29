@@ -11,7 +11,10 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
- 
+use App\Models\ProductColor;
+ use Illuminate\Support\Facades\Cache;
+
+
 new class extends Component {
     public int $productId;
 
@@ -42,7 +45,7 @@ $pool = is_string($requested) && $this->variants->contains('color', $requested)
     : $this->variants;
 
 $default = $pool->first(fn (ProductVariant $v): bool => $v->stock_quantity > 0) ?? $pool->first();
-       
+
        abort_if($default === null, 404);
 
         $this->color = $default->color;
@@ -457,4 +460,8 @@ $firstUrls = collect($galleries)->map(fn ($g) => $g['images'][0]['url'] ?? null)
             @endif
         </div>
     </div>
+
+    {{-- اقتراحات مؤجَّلة: تُحمَّل بعد الصفحة ولا تتأثر بتبديل اللون. --}}
+<livewire:store.recommendations mode="related" :product-id="$product->id" title="قد يعجبك أيضًا"
+                                lazy wire:key="recs-{{ $product->id }}" />
 </div>

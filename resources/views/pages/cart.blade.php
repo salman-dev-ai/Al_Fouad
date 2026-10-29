@@ -13,8 +13,8 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 
-new 
- #[Title('سلة التسوق')] 
+new
+ #[Title('سلة التسوق')]
 class extends Component {
     #[Computed]
     public function currency(): string
@@ -81,6 +81,8 @@ class extends Component {
 @endphp
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+
     <x-store.breadcrumbs :items="[['label' => 'الرئيسية', 'url' => route('home')], ['label' => 'سلة التسوق']]" />
 
     <h1 class="mt-4 text-2xl font-extrabold sm:text-3xl">سلة التسوق</h1>
@@ -104,7 +106,7 @@ class extends Component {
                         $item = $line['item'];
                         $variant = $line['variant'];
                         $product = $variant->product;
-$image = $product->imageForColor($variant->product_color_id);                        $canIncrease = $line['quantity'] < min($variant->stock_quantity, $max);
+                        $image = $product->imageForColor($variant->product_color_id);                        $canIncrease = $line['quantity'] < min($variant->stock_quantity, $max);
                     @endphp
 
                     <li wire:key="line-{{ $item->id }}" class="flex gap-4 p-4">
@@ -187,6 +189,8 @@ $image = $product->imageForColor($variant->product_color_id);                   
                         </div>
                     @endif
 
+                    <x-store.free-shipping-bar :summary="$summary" :currency="$currency" />
+
                     <div class="flex justify-between gap-3">
                         <dt class="text-ink-soft">رسوم التوصيل</dt>
                         <dd class="font-semibold">
@@ -223,4 +227,7 @@ $image = $product->imageForColor($variant->product_color_id);                   
             </aside>
         </div>
     @endif
+
+    {{-- مكمّلات مؤجَّلة لمحتويات السلة، لا تعيق تعديل الكميات ولا زر إتمام الطلب. --}}
+<livewire:store.recommendations mode="cart" title="أكمل إطلالتك" lazy wire:key="cart-recs" />
 </div>

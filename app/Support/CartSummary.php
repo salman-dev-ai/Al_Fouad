@@ -21,7 +21,22 @@ final readonly class CartSummary
         public int $taxMinor,
         public int $deliveryFeeMinor,
         public int $totalMinor,
+        // حد الشحن المجاني بالوحدة الصغرى (null = غير مفعّل أو الشحن أصلًا مجاني).
+        public ?int $freeShippingThresholdMinor = null,
+        // المبلغ المتبقي للوصول للحد (0 = تحقق الحد).
+        public int $freeShippingRemainingMinor = 0,
     ) {}
+
+
+    // هل تحقق شرط الشحن المجاني في هذه السلة؟
+    // يستعملها شريط السلة لعرض رسالة التهنئة بدل المبلغ المتبقي.
+    // false إن كانت الميزة غير مفعّلة أو السلة فارغة.
+    public function qualifiesForFreeShipping(): bool
+    {
+        return $this->freeShippingThresholdMinor !== null
+            && ! $this->isEmpty()
+            && $this->freeShippingRemainingMinor === 0;
+    }
 
     public function isEmpty(): bool
     {

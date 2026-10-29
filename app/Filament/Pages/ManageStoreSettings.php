@@ -112,6 +112,16 @@ class ManageStoreSettings extends Page
                                 ->minValue(0)
                                 ->required()
                                 ->suffix('ريال'),
+                            // حد الشحن المجاني: إن بلغ مجموع المنتجات (قبل الضريبة) هذا المبلغ صار التوصيل مجانًا.
+                            // يُترك فارغًا لتعطيل الميزة، ولا يقبل قيمة سالبة.
+                            // يقرأه SummarizeCart ويعرضه شريط التقدم في السلة.
+                            TextInput::make('free_shipping_threshold')
+                                ->label('حد الشحن المجاني')
+                                ->numeric()
+                                ->minValue(0)
+                                ->nullable()
+                                ->helperText('اتركه فارغًا لتعطيل الشحن المجاني. يُحسب على مجموع المنتجات قبل الضريبة.'),
+
                             Select::make('currency_code')
                                 ->label('العملة')
                                 ->options([

@@ -21,12 +21,14 @@ class StoreSetting extends Model
         'announcement_text',
         'announcement_enabled',
         'maintenance_mode',
+        'free_shipping_threshold',
     ];
 
     protected function casts(): array
     {
         return [
             'delivery_fee' => 'decimal:2',
+            'free_shipping_threshold' => 'decimal:2',
             'tax_enabled' => 'boolean',
             'tax_rate' => 'decimal:2',
             'opening_hours' => 'array',
