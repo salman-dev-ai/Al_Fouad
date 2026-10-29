@@ -14,6 +14,7 @@ class ProductImage extends Model
         'alt_text',
         'sort_order',
         'is_primary',
+        'product_color_id'
     ];
 
     protected function casts(): array
@@ -35,4 +36,20 @@ class ProductImage extends Model
     {
         return Attribute::get(fn (): string => asset('storage/' . $this->image_path));
     }
+
+
+    protected function productColor():BelongsTo{
+        return $this->belongsTo(ProductColor::class);
+    }
+
+
+    protected static function booted(): void
+{
+    // صورة اللون تتبع منتج لونها دائمًا
+    static::saving(function (ProductImage $image): void {
+        if ($image->product_color_id) {
+            $image->product_id = ProductColor::query()->whereKey($image->product_color_id)->value('product_id');
+        }
+    });
+}
 }

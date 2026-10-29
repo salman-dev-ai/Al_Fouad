@@ -2,7 +2,7 @@
 
 namespace App\Actions\Orders;
 
-
+use App\Models\User;
 use App\Models\StoreSetting;
 use App\Actions\Cart\SummarizeCart;
 use App\Enums\OrderStatus;
@@ -17,6 +17,8 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
+
+
 class PlaceOrder
 {
     public function __construct(private readonly SummarizeCart $summarize) {}
@@ -27,15 +29,17 @@ class PlaceOrder
      *
      * @throws ValidationException
      */
-    public function execute(Cart $cart, array $data): Order
-    {
+// ينشئ الطلب بكل ضماناته (قفل، مخزون، لقطة أسعار) ويربطه بحساب المشتري إن كان مسجّل دخوله.
+// $user يأتي من الخادم (auth) وليس من المتصفح، فلا يمكن نسب طلب لحساب غيره.
+// الباقي كما هو دون تغيير.
+public function execute(Cart $cart, array $data, ?User $user = null): Order    {
 
         if (StoreSetting::current()?->maintenance_mode) {
     throw ValidationException::withMessages([
         'cart' => 'المتجر مغلق مؤقتًا للصيانة. حاول لاحقًا.',
     ]);
 }
-        return DB::transaction(function () use ($cart, $data): Order {
+        return DB::transaction(function () use ($cart, $data,$user): Order {
             // قفل السلة: ضغطتان متزامنتان على «تأكيد» تتسلسلان، والثانية تجد السلة فارغة
             Cart::query()->whereKey($cart->getKey())->lockForUpdate()->firstOrFail();
 
@@ -62,6 +66,7 @@ class PlaceOrder
             $order = Order::create([
                 'order_number' => $this->generateOrderNumber(),
                 'customer_id' => $customer->id,
+                'user_id' => $user?->id,
                 'customer_name' => $data['name'],
                 'customer_phone' => $data['phone'],
                 'delivery_address' => $data['address'],

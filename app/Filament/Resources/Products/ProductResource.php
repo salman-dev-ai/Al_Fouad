@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Products;
 
+
+use App\Filament\Resources\Products\RelationManagers\ColorsRelationManager;
 use App\Filament\Resources\Products\Pages\CreateProduct;
 use App\Filament\Resources\Products\Pages\EditProduct;
 use App\Filament\Resources\Products\Pages\ListProducts;
@@ -22,7 +24,7 @@ class ProductResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
 
-        protected static ?string $modelLabel = 'منتج';
+    protected static ?string $modelLabel = 'منتج';
 
     protected static ?string $pluralModelLabel = 'المنتجات';
 
@@ -46,7 +48,7 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ColorsRelationManager::class,
         ];
     }
 

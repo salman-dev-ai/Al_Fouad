@@ -12,7 +12,10 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('سلة التسوق')] class extends Component {
+
+new 
+ #[Title('سلة التسوق')] 
+class extends Component {
     #[Computed]
     public function currency(): string
     {
@@ -101,8 +104,7 @@ new #[Title('سلة التسوق')] class extends Component {
                         $item = $line['item'];
                         $variant = $line['variant'];
                         $product = $variant->product;
-                        $image = $product->main_image;
-                        $canIncrease = $line['quantity'] < min($variant->stock_quantity, $max);
+$image = $product->imageForColor($variant->product_color_id);                        $canIncrease = $line['quantity'] < min($variant->stock_quantity, $max);
                     @endphp
 
                     <li wire:key="line-{{ $item->id }}" class="flex gap-4 p-4">
@@ -203,7 +205,7 @@ new #[Title('سلة التسوق')] class extends Component {
                         في سلتك عناصر تحتاج تعديلًا قبل إتمام الطلب.
                     </p>
                 @endif
-                
+
                 @if ($summary->hasBlockingIssues())
                     <span class="block cursor-not-allowed rounded-md bg-ink-soft/40 px-5 py-3 text-center text-base font-extrabold text-white" aria-disabled="true">إتمام الطلب</span>
                 @else

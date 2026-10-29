@@ -12,6 +12,9 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
+use Closure;
+use App\Support\ColorHex;
+use Filament\Forms\Components\ColorPicker;
 
 class ProductForm
 {
@@ -69,10 +72,10 @@ class ProductForm
                             ->default(false),
                     ]),
 
-                Section::make('صور المنتج')
+                Section::make('الصور العامة (للمنتجات القديمة)')
                     ->description('حدّد صورة رئيسية واحدة، ورتّب الصور بالسحب.')
                     ->schema([
-                        Repeater::make('images')
+                        Repeater::make('generalImages')
                             ->hiddenLabel()
                             ->relationship()
                             ->orderColumn('sort_order')
@@ -81,6 +84,7 @@ class ProductForm
                             ->addActionLabel('إضافة صورة')
                             ->maxItems(8)
                             ->columns(3)
+                            ->collapsed()
                             ->schema([
                                 FileUpload::make('image_path')
                                     ->label('الصورة')
@@ -103,70 +107,6 @@ class ProductForm
                             ]),
                     ]),
 
-                Section::make('الخيارات: المقاس واللون والسعر والمخزون')
-                    ->description('كل صف يمثل تركيبة مقاس ولون، وله سعره ومخزونه.')
-                    ->schema([
-                        Repeater::make('variants')
-                            ->hiddenLabel()
-                            ->relationship()
-                            ->minItems(1)
-                            ->defaultItems(1)
-                            ->collapsible()
-                            ->addActionLabel('إضافة خيار')
-                            ->columns(3)
-                            ->itemLabel(fn (array $state): ?string => filled($state['size'] ?? null)
-                                ? trim(($state['size'] ?? '') . ' - ' . ($state['color'] ?? ''))
-                                : null)
-                            ->rules([
-                                fn (): \Closure => function (string $attribute, $value, \Closure $fail): void {
-                                    $keys = collect($value)->map(fn ($v) => mb_strtolower(trim(($v['size'] ?? '') . '|' . ($v['color'] ?? ''))));
-
-                                    if ($keys->count() !== $keys->unique()->count()) {
-                                        $fail('لا يمكن تكرار المقاس نفسه مع اللون نفسه.');
-                                    }
-                                },
-                            ])
-                            ->schema([
-                                Select::make('size')
-                                    ->label('المقاس')
-                                    ->options(array_combine(self::SIZES, self::SIZES))
-                                    ->required(),
-
-                                TextInput::make('color')
-                                    ->label('اللون')
-                                    ->required()
-                                    ->maxLength(50),
-
-                                TextInput::make('sku')
-                                    ->label('رمز المنتج (SKU)')
-                                    ->maxLength(64)
-                                    ->unique(table: 'product_variants', column: 'sku', ignoreRecord: true),
-
-                                TextInput::make('price')
-                                    ->label('السعر')
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->required()
-                                    ->suffix('ريال'),
-
-                                TextInput::make('compare_at_price')
-                                    ->label('السعر قبل الخصم')
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->gt('price')
-                                    ->validationMessages(['gt' => 'يجب أن يكون السعر قبل الخصم أكبر من السعر الحالي.'])
-                                    ->helperText('اتركه فارغًا إن لم يكن هناك خصم.')
-                                    ->suffix('ريال'),
-
-                                TextInput::make('stock_quantity')
-                                    ->label('الكمية المتوفرة')
-                                    ->numeric()
-                                    ->integer()
-                                    ->minValue(0)
-                                    ->default(0)
-                                    ->required(),
-                            ]),
-                    ]),
             ]);
     }
 }

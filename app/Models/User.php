@@ -12,7 +12,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+#[Fillable(['name', 'email', 'password','phone'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -31,6 +33,13 @@ class User extends Authenticatable implements FilamentUser
     return $this->is_admin;
 }
 
+// عناوين الشحن المحفوظة للمستخدم.
+// كل عمليات العناوين في المتجر تمر من هذه العلاقة، فتكون محصورة بعناوينه فقط.
+public function addresses(): HasMany
+{
+    return $this->hasMany(Address::class);
+}
+
 
     protected function casts(): array
     {
@@ -40,4 +49,11 @@ class User extends Authenticatable implements FilamentUser
             'is_admin' => 'boolean',
         ];
     }
+
+    // طلبات هذا الحساب، وهي ما أُجري وهو مسجّل دخوله فقط.
+// لا تتضمن طلبات الزائر القديمة بالرقم نفسه (حفاظًا على الخصوصية كما اتفقنا).
+public function orders(): HasMany
+{
+    return $this->hasMany(Order::class);
+}
 }

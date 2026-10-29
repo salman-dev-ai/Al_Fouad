@@ -49,6 +49,13 @@
                 </a>
 
                 <livewire:store.cart-count />
+
+                {{-- يعرض «حسابي» للمسجّل و«دخول» للزائر. --}}
+@auth
+    <a href="{{ route('account') }}" wire:navigate class="rounded-md px-3 py-2 text-sm font-bold hover:bg-brand-50">حسابي</a>
+@else
+    <a href="{{ route('login') }}" wire:navigate class="rounded-md px-3 py-2 text-sm font-bold hover:bg-brand-50">دخول</a>
+@endauth
             </nav>
 
         </div>

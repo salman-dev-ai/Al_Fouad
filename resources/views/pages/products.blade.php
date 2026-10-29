@@ -9,7 +9,9 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-new #[Title('المنتجات')] class extends Component {
+new 
+#[Title('المنتجات')] 
+class extends Component {
     use WithPagination;
 
     private const PER_PAGE = 12;
@@ -112,7 +114,7 @@ new #[Title('المنتجات')] class extends Component {
                 ->when($min !== null, fn ($v) => $v->where('price', '>=', $min))
                 ->when($max !== null, fn ($v) => $v->where('price', '<=', $max))
                 ->when($this->inStockOnly, fn ($v) => $v->where('stock_quantity', '>', 0))))
-            ->with(['category:id,name', 'images', 'variants'])
+->with(['category:id,name', 'images', 'variants', 'colors:id,product_id,sort_order'])
             ->withMin('variants', 'price');
 
         // قائمة بيضاء للفرز: لا نثق بالقيمة القادمة من الرابط
@@ -240,7 +242,7 @@ new #[Title('المنتجات')] class extends Component {
                 </div>
 
                 <div class="mt-10">
-                    {{ $this->products->links() }}
+              {{ $this->products->onEachSide(0)->links('vendor.pagination.simple-tailwind') }}
                 </div>
             @endif
         </section>

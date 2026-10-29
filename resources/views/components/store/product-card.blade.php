@@ -16,6 +16,10 @@
         $colors <= 10 => $colors . ' ألوان',
         default => $colors . ' لونًا',
     };
+
+    $swatches = $product->colorSwatches();
+$dots = $swatches->filter(fn ($s) => $s['hex'])->take(5);
+$moreColors = max(0, $swatches->count() - $dots->count());
 @endphp
 
 <article {{ $attributes->class(['group relative flex flex-col']) }}>
@@ -60,7 +64,19 @@
                         class="text-xs text-ink-soft">{{ \App\Support\Money::format($cheapest->compare_at_price, $currency) }}</s>
                 @endif
             </p>
-            <p class="text-xs text-ink-soft">{{ $colorsLabel }}</p>
+         <p class="flex items-center gap-2 text-xs text-ink-soft">
+    @if ($dots->isNotEmpty())
+        <span class="flex items-center gap-1" aria-hidden="true">
+            @foreach ($dots as $dot)
+                <span style="background-color: {{ $dot['hex'] }}" class="size-3.5 rounded-full ring-1 ring-inset ring-black/20"></span>
+            @endforeach
+            @if ($moreColors > 0)
+                <span>+{{ $moreColors }}</span>
+            @endif
+        </span>
+    @endif
+    <span>{{ $colorsLabel }}</span>
+</p>
         @else
             <p class="text-sm text-ink-soft">غير متوفر حاليًا</p>
         @endif

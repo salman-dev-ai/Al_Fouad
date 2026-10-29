@@ -25,6 +25,7 @@ class Order extends Model
         'total',
         'status',
         'payment_method' => PaymentMethod::class,
+        'user_id',
     ];
 
     protected function casts(): array
@@ -48,4 +49,11 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    // صاحب الحساب الذي أجرى الطلب (NULL لطلبات الزوار).
+// يُستعمل في «طلباتي» لعرض طلبات المستخدم الحالي فقط.
+public function user(): BelongsTo
+{
+    return $this->belongsTo(User::class);
+}
 }

@@ -80,7 +80,7 @@ new #[Title('الفؤاد — أزياء عصرية')] class extends Component {
             ->active()
             ->whereHas('category', fn ($q) => $q->active())
             ->whereHas('variants')
-            ->with(['category:id,name', 'images', 'variants'])
+->with(['category:id,name', 'images', 'variants', 'colors:id,product_id,sort_order'])
             ->withMin('variants', 'price');
     }
 };

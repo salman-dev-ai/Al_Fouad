@@ -1,37 +1,61 @@
 <?php
 
-use App\Actions\Orders\PlaceOrder;
 use App\Actions\Cart\ResolveCart;
 use App\Actions\Cart\SummarizeCart;
+use App\Actions\Orders\PlaceOrder;
+use App\Livewire\Forms\AddressForm;
+use App\Models\Address;
 use App\Models\StoreSetting;
 use App\Support\CartSummary;
-use App\Support\GoogleMapsUrl;
 use App\Support\PhoneNumber;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-new #[Title('إتمام الطلب')] class extends Component {
-    public string $name = '';
+new
+ #[Title('إتمام الطلب')] 
+ class extends Component {
+    public AddressForm $form;
 
-    public string $phone = '';
-
+    #[Validate('nullable|email|max:255', message: 'أدخل بريدًا إلكترونيًا صحيحًا.')]
     public string $email = '';
 
-    public string $city = '';
+    // اختيار العنوان المحفوظ: '' يعني «عنوان آخر»، وأي رقم يعني عنوانًا من عناوين المستخدم.
+    public string $addressChoice = '';
 
-    public string $address = '';
+    public bool $saveAddress = false;
 
-    public string $notes = '';
-
-    public string $location_url = '';
-
+    // يجهّز الصفحة: يعيد من السلة الفارغة، وللمسجّل يملأ البيانات من عنوانه الافتراضي (أو من حسابه).
+    // الزائر تبقى حقوله فارغة كما كان.
+    // كل ما يُملأ قابل للتعديل قبل التأكيد.
     public function mount(): void
     {
         if (! $this->summary || $this->summary->isEmpty()) {
             $this->redirectRoute('cart', navigate: true);
+
+            return;
+        }
+
+        $user = auth()->user();
+
+        if (! $user) {
+            return;
+        }
+
+        $this->email = (string) $user->email;
+
+        $default = $this->addresses->firstWhere('is_default', true) ?? $this->addresses->first();
+
+        if ($default) {
+            $this->addressChoice = (string) $default->id;
+            $this->fillFromAddress($default);
+        } else {
+            $this->form->recipient_name = $user->name;
+            $this->form->phone = (string) $user->phone;
         }
     }
 
@@ -41,6 +65,8 @@ new #[Title('إتمام الطلب')] class extends Component {
         return StoreSetting::current()?->currency_code ?? 'YER';
     }
 
+    // ملخص السلة من مصدر الحساب الوحيد (SummarizeCart)، لا من أي رقم يرسله المتصفح.
+    // يُعاد حسابه كل مرة من قاعدة البيانات.
     #[Computed]
     public function summary(): ?CartSummary
     {
@@ -49,60 +75,55 @@ new #[Title('إتمام الطلب')] class extends Component {
         return $cart ? app(SummarizeCart::class)->execute($cart) : null;
     }
 
-    protected function rules(): array
+    // عناوين المستخدم الحالي فقط (الافتراضي أولًا)، وللزائر مجموعة فارغة.
+    // تُستعمل لعرض اختيار العنوان.
+    // لا تقبل أي معرّف مستخدم من المتصفح.
+    #[Computed]
+    public function addresses(): Collection
     {
-        return [
-            'name' => ['required', 'string', 'min:3', 'max:100'],
-            'phone' => ['required', 'string', 'max:30', function (string $attribute, mixed $value, \Closure $fail): void {
-                if (PhoneNumber::normalize((string) $value, config('store.default_country_code')) === null) {
-                    $fail('أدخل رقم جوال صحيحًا، مثل 777123456.');
-                }
-            }],
-            'email' => ['nullable', 'email', 'max:255'],
-            'city' => ['required', 'string', 'max:100'],
-            'address' => ['required', 'string', 'min:5', 'max:500'],
-            'notes' => ['nullable', 'string', 'max:500'],
-            'location_url' => ['nullable', 'string', 'max:2048', function (string $attribute, mixed $value, \Closure $fail): void {
-                if (filled($value) && ! GoogleMapsUrl::isValid((string) $value)) {
-                    $fail('أدخل رابطًا صحيحًا من خرائط Google، أو استخدم زر «استخدم موقعي الحالي».');
-                }
-            }],
-        ];
+        return auth()->check()
+            ? auth()->user()->addresses()->orderByDesc('is_default')->orderByDesc('id')->get()
+            : new Collection();
     }
 
-    protected function messages(): array
+    // عند تغيير اختيار العنوان: العنوان المحفوظ يملأ الحقول، و«عنوان آخر» يفرّغ حقول العنوان فقط.
+    // الجلب من عناوين المستخدم نفسه (findOrFail)، فمعرّف غيره يعطي 404.
+    // التعديل بعد التعبئة يخص هذا الطلب فقط ولا يغيّر العنوان المحفوظ.
+    public function updatedAddressChoice(string $value): void
     {
-        return [
-            'required' => 'حقل :attribute مطلوب.',
-            'string' => 'قيمة :attribute غير صالحة.',
-            'min' => 'حقل :attribute قصير جدًا (الحد الأدنى :min أحرف).',
-            'max' => 'حقل :attribute طويل جدًا (الحد الأقصى :max).',
-            'email' => 'أدخل بريدًا إلكترونيًا صحيحًا.',
-        ];
+        $this->resetValidation();
+        $this->saveAddress = false;
+
+        if ($value === '') {
+            $this->form->city = '';
+            $this->form->address_line = '';
+            $this->form->notes = '';
+            $this->form->location_url = '';
+
+            return;
+        }
+
+        $this->fillFromAddress(auth()->user()->addresses()->findOrFail((int) $value));
     }
 
-    protected function validationAttributes(): array
+    // ينسخ حقول عنوان محفوظ إلى نموذج الإتمام (دون ربط معرّفه، حتى لا يُعدَّل المحفوظ بالخطأ).
+    private function fillFromAddress(Address $address): void
     {
-        return [
-            'name' => 'الاسم',
-            'phone' => 'رقم الجوال',
-            'email' => 'البريد الإلكتروني',
-            'city' => 'المدينة',
-            'address' => 'العنوان',
-            'notes' => 'الملاحظات',
-            'location_url' => 'رابط الموقع',
-        ];
+        $this->form->recipient_name = $address->recipient_name;
+        $this->form->phone = $address->phone;
+        $this->form->city = $address->city;
+        $this->form->address_line = $address->address_line;
+        $this->form->notes = (string) $address->notes;
+        $this->form->location_url = (string) $address->location_url;
     }
 
-    /** تحقق فوري من كل حقل عند مغادرته. */
-    public function updated(string $property): void
-    {
-        $this->validateOnly($property);
-    }
-
+    // يتحقق من الحقول ثم يضع الطلب عبر PlaceOrder (معاملة + قفل المخزون)، بحد معدل لكل IP ولكل سلة.
+    // يربط الطلب بالحساب إن وُجد، ويحفظ العنوان في الحساب إن اختار العميل ذلك (فشل الحفظ لا يُفقد الطلب).
+    // ينتقل بعدها إلى صفحة التأكيد المقصورة على جلسة صاحب الطلب.
     public function placeOrder(PlaceOrder $placeOrder, ResolveCart $carts): void
     {
-        $validated = $this->validate();
+        $this->validate();
+        $this->form->validate();
 
         $cart = $carts->find();
 
@@ -116,7 +137,7 @@ new #[Title('إتمام الطلب')] class extends Component {
         $cartKey = 'place-order-cart:' . $cart->id;
 
         if (RateLimiter::tooManyAttempts($ipKey, 30) || RateLimiter::tooManyAttempts($cartKey, 5)) {
-            $this->addError('form', 'محاولات كثيرة، حاول بعد قليل.');
+            $this->addError('checkout', 'محاولات كثيرة، حاول بعد قليل.');
 
             return;
         }
@@ -124,20 +145,31 @@ new #[Title('إتمام الطلب')] class extends Component {
         RateLimiter::hit($ipKey, 600);
         RateLimiter::hit($cartKey, 600);
 
+        $user = auth()->user();
+
         try {
             $order = $placeOrder->execute($cart, [
-                'name' => trim($validated['name']),
-                'phone' => PhoneNumber::normalize($validated['phone'], config('store.default_country_code')),
-                'email' => filled($validated['email']) ? mb_strtolower(trim($validated['email'])) : null,
-                'city' => trim($validated['city']),
-                'address' => trim($validated['address']),
-                'notes' => filled($validated['notes']) ? trim($validated['notes']) : null,
-                'location_url' => filled($validated['location_url']) ? trim($validated['location_url']) : null,
-            ]);
+                'name' => trim($this->form->recipient_name),
+                'phone' => PhoneNumber::normalize($this->form->phone, config('store.default_country_code')),
+                'email' => filled($this->email) ? mb_strtolower(trim($this->email)) : null,
+                'city' => trim($this->form->city),
+                'address' => trim($this->form->address_line),
+                'notes' => filled($this->form->notes) ? trim($this->form->notes) : null,
+                'location_url' => filled($this->form->location_url) ? trim($this->form->location_url) : null,
+            ], $user);
         } catch (ValidationException $e) {
-            $this->addError('form', $e->validator->errors()->first());
+            $this->addError('checkout', $e->validator->errors()->first());
 
             return;
+        }
+
+        if ($user && $this->saveAddress && $this->addressChoice === ''
+            && $user->addresses()->count() < Address::MAX_PER_USER) {
+            try {
+                $this->form->save($user);
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         // صلاحية رؤية صفحة التأكيد: لمن أنشأ الطلب في جلسته فقط
@@ -153,6 +185,8 @@ new #[Title('إتمام الطلب')] class extends Component {
     $currency = $this->currency;
 @endphp
 
+{{-- صفحة إتمام الطلب: بيانات الاستلام (مع اختيار عنوان محفوظ للمسجّل) + الموقع + الدفع + ملخص الطلب. --}}
+{{-- المنطق كله في الخادم (PlaceOrder)، وAlpine يظهر فقط داخل مكوّن الموقع. --}}
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
     <x-store.breadcrumbs :items="[
         ['label' => 'الرئيسية', 'url' => route('home')],
@@ -166,66 +200,85 @@ new #[Title('إتمام الطلب')] class extends Component {
         <form wire:submit="placeOrder" novalidate class="mt-6 grid items-start gap-8 lg:grid-cols-[1fr_24rem]">
             <div class="space-y-6">
 
+                @guest
+                    <p class="rounded-lg bg-brand-50 p-4 text-sm">
+                        لديك حساب؟
+                        <a href="{{ route('login', ['next' => 'checkout']) }}" wire:navigate class="font-bold text-brand-700 underline underline-offset-4">سجّل دخولك</a>
+                        أو
+                        <a href="{{ route('register', ['next' => 'checkout']) }}" wire:navigate class="font-bold text-brand-700 underline underline-offset-4">أنشئ حسابًا</a>
+                        لتُملأ بياناتك تلقائيًا في كل طلب.
+                    </p>
+                @endguest
+
+                @if ($this->addresses->isNotEmpty())
+                    <fieldset class="space-y-3 rounded-lg border border-line p-5">
+                        <legend class="px-1 text-lg font-extrabold">عنوان الشحن</legend>
+
+                        @foreach ($this->addresses as $address)
+                            <label wire:key="choice-{{ $address->id }}" class="block cursor-pointer">
+                                <input type="radio" wire:model.live="addressChoice" value="{{ $address->id }}" class="peer sr-only">
+                                <span class="block rounded-md border border-line p-4 text-sm peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-500">
+                                    <span class="font-bold">
+                                        {{ $address->label ?: 'عنوان' }}
+                                        @if ($address->is_default)
+                                            <span class="ms-1 rounded-sm bg-brand-700 px-1.5 py-0.5 text-xs text-white">افتراضي</span>
+                                        @endif
+                                    </span>
+                                    <span class="block text-ink-soft">{{ $address->recipient_name }} — {{ $address->city }}، {{ $address->address_line }}</span>
+                                </span>
+                            </label>
+                        @endforeach
+
+                        <label class="block cursor-pointer">
+                            <input type="radio" wire:model.live="addressChoice" value="" class="peer sr-only">
+                            <span class="block rounded-md border border-line p-4 text-sm font-bold peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-500">
+                                + عنوان آخر
+                            </span>
+                        </label>
+                    </fieldset>
+                @endif
+
                 <section class="space-y-4 rounded-lg border border-line p-5" aria-labelledby="delivery-heading">
                     <h2 id="delivery-heading" class="text-lg font-extrabold">بيانات الاستلام</h2>
+                    @if ($this->addresses->isNotEmpty())
+                        <p class="text-sm text-ink-soft">يمكنك تعديل أي بيانات لهذا الطلب دون تغيير عنوانك المحفوظ.</p>
+                    @endif
 
-                    <x-store.field name="name" label="الاسم الكامل" required autocomplete="name" wire:model.blur="name" />
+                    <x-store.field name="form.recipient_name" label="الاسم الكامل" required autocomplete="name"
+                                   wire:model.blur="form.recipient_name" />
 
-                    <x-store.field name="phone" label="رقم الجوال" required type="tel" inputmode="tel" dir="ltr"
+                    <x-store.field name="form.phone" label="رقم الجوال" required type="tel" inputmode="tel" dir="ltr"
                                    placeholder="777123456" autocomplete="tel"
-                                   helper="سنتواصل معك على هذا الرقم لتأكيد الطلب." wire:model.blur="phone" />
+                                   helper="سنتواصل معك على هذا الرقم لتأكيد الطلب." wire:model.blur="form.phone" />
 
                     <x-store.field name="email" label="البريد الإلكتروني" type="email" dir="ltr"
                                    autocomplete="email" wire:model.blur="email" />
 
-                    <x-store.field name="city" label="المدينة" required autocomplete="address-level2" wire:model.blur="city" />
+                    <x-store.field name="form.city" label="المدينة" required autocomplete="address-level2"
+                                   wire:model.blur="form.city" />
 
-                    <x-store.field name="address" as="textarea" label="العنوان بالتفصيل" required
+                    <x-store.field name="form.address_line" as="textarea" label="العنوان بالتفصيل" required
                                    placeholder="الحي، الشارع، أقرب معلم..." autocomplete="street-address"
-                                   wire:model.blur="address" />
+                                   wire:model.blur="form.address_line" />
 
-                    <x-store.field name="notes" as="textarea" label="ملاحظات للتوصيل"
-                                   wire:model.blur="notes" />
+                    <x-store.field name="form.notes" as="textarea" label="ملاحظات للتوصيل" wire:model.blur="form.notes" />
                 </section>
 
-                {{-- الموقع: Alpine للتفاعل المحلي فقط، والخادم يتحقق من الرابط --}}
-                <section class="space-y-3 rounded-lg border border-line p-5" aria-labelledby="location-heading"
-                         x-data="{
-                            locating: false,
-                            message: '',
-                            locate() {
-                                if (!navigator.geolocation) { this.message = 'متصفحك لا يدعم تحديد الموقع.'; return; }
-                                this.locating = true;
-                                this.message = '';
-                                navigator.geolocation.getCurrentPosition(
-                                    (pos) => {
-                                        this.$wire.location_url = 'https://www.google.com/maps?q=' + pos.coords.latitude.toFixed(6) + ',' + pos.coords.longitude.toFixed(6);
-                                        this.locating = false;
-                                        this.message = 'تم تحديد موقعك. يمكنك تعديل الرابط أو حذفه.';
-                                    },
-                                    () => {
-                                        this.locating = false;
-                                        this.message = 'تعذّر تحديد موقعك. اسمح للمتصفح بالوصول للموقع أو الصق رابطًا يدويًا.';
-                                    },
-                                    { enableHighAccuracy: true, timeout: 10000 }
-                                );
-                            }
-                         }">
+                <section class="space-y-3 rounded-lg border border-line p-5" aria-labelledby="location-heading">
                     <h2 id="location-heading" class="text-lg font-extrabold">موقعك على الخريطة <span class="text-sm font-normal text-ink-soft">(اختياري)</span></h2>
                     <p class="text-sm text-ink-soft">يساعد المندوب في الوصول إليك بسرعة.</p>
 
-                    <button type="button" @click="locate()" :disabled="locating"
-                            class="flex items-center gap-2 rounded-md border border-brand-600 px-4 py-2.5 text-sm font-bold text-brand-700 hover:bg-brand-50 disabled:opacity-60">
-                        <x-lucide-map-pin class="size-4" aria-hidden="true" />
-                        <span x-text="locating ? 'جارٍ تحديد الموقع…' : 'استخدم موقعي الحالي'">استخدم موقعي الحالي</span>
-                    </button>
-                    <p x-show="message" x-cloak x-text="message" class="text-sm text-ink-soft" role="status"></p>
-
-                    <x-store.field name="location_url" label="رابط الموقع" type="url" dir="ltr"
-                                   placeholder="https://maps.app.goo.gl/..."
-                                   helper="يمكنك لصق رابط من تطبيق خرائط Google."
-                                   wire:model.blur="location_url" />
+                    <x-store.location-field model="form.location_url" />
                 </section>
+
+                @auth
+                    @if ($addressChoice === '')
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="checkbox" wire:model="saveAddress" class="size-4 rounded border-line accent-brand-600">
+                            احفظ هذا العنوان في حسابي لأستخدمه في طلباتي القادمة
+                        </label>
+                    @endif
+                @endauth
 
                 <section class="space-y-3 rounded-lg border border-line p-5" aria-labelledby="payment-heading">
                     <h2 id="payment-heading" class="text-lg font-extrabold">طريقة الدفع</h2>
@@ -239,7 +292,6 @@ new #[Title('إتمام الطلب')] class extends Component {
                 </section>
             </div>
 
-            {{-- الملخص وزر التأكيد --}}
             <aside class="space-y-4 rounded-lg border border-line bg-surface p-5 lg:sticky lg:top-24" aria-labelledby="summary-heading">
                 <h2 id="summary-heading" class="text-lg font-extrabold">ملخص الطلب</h2>
 
@@ -259,7 +311,7 @@ new #[Title('إتمام الطلب')] class extends Component {
                                 :tax="$summary->taxEnabled ? $summary->taxMinor : null" :tax-rate="$summary->taxRate"
                                 :delivery="$summary->deliveryFeeMinor" :total="$summary->totalMinor" :currency="$currency" />
 
-                @error('form')
+                @error('checkout')
                     <p class="rounded-md border border-danger/30 bg-white px-3 py-2 text-sm font-semibold text-danger" role="alert">{{ $message }}</p>
                 @enderror
 
