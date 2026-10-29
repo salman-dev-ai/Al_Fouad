@@ -452,6 +452,11 @@ $firstUrls = collect($galleries)->map(fn ($g) => $g['images'][0]['url'] ?? null)
                 @endif
             </div>
 
+            {{-- تنبيه التوفر: للخيار المحدد المنتهي فقط، والمفتاح يتغير بتغير الخيار فيُعاد بناء المكوّن. --}}
+@if ($variant && $variant->stock_quantity < 1)
+    <livewire:store.stock-alert :variant-id="$variant->id" wire:key="stock-alert-{{ $variant->id }}" />
+@endif
+
             @if (filled($product->description))
                 <div class="border-t border-line pt-6">
                     <h2 class="mb-2 text-base font-extrabold">الوصف</h2>

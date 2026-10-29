@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Support\ColorHex;
 use Illuminate\Support\Collection;
+use App\Observers\ProductVariantObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+
+
+#[ObservedBy(ProductVariantObserver::class)]
 class ProductVariant extends Model
 {
 
