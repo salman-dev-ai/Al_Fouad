@@ -34,11 +34,16 @@ public function swatches(): Collection
     {
         $this->productId = $product->id;
 
-        // الخيار الافتراضي: أول خيار متوفر، وإلا أول خيار
-        $default = $this->variants->first(fn (ProductVariant $v): bool => $v->stock_quantity > 0)
-            ?? $this->variants->first();
+      // اللون المطلوب في الرابط (?color=) يُعتمد فقط إن وُجد بين ألوان المنتج، وإلا نعود للافتراضي.
+// هكذا يفتح رابط المشاركة على اللون الذي شاركه صاحبه، ولا يؤثر أي قيمة مزوّرة.
+$requested = request()->query('color');
+$pool = is_string($requested) && $this->variants->contains('color', $requested)
+    ? $this->variants->where('color', $requested)
+    : $this->variants;
 
-        abort_if($default === null, 404);
+$default = $pool->first(fn (ProductVariant $v): bool => $v->stock_quantity > 0) ?? $pool->first();
+       
+       abort_if($default === null, 404);
 
         $this->color = $default->color;
         $this->size = $default->size;
@@ -332,8 +337,14 @@ $firstUrls = collect($galleries)->map(fn ($g) => $g['images'][0]['url'] ?? null)
             <div class="space-y-2">
                 <a href="{{ route('products.index', ['category' => $product->category->slug]) }}" wire:navigate
                    class="text-sm font-semibold text-brand-700 hover:underline">{{ $product->category->name }}</a>
-                <h1 class="text-2xl font-extrabold sm:text-3xl">{{ $product->name }}</h1>
-            </div>
+<div class="flex items-start justify-between gap-3">
+    <h1 class="text-2xl font-extrabold sm:text-3xl">{{ $product->name }}</h1>
+
+    <div class="flex shrink-0 items-center gap-2">
+        <x-store.favorite-button :product="$product" class="border border-line" />
+        <x-store.share-button :url="route('products.show', ['product' => $product->slug])" :title="$product->name" class="border border-line" />
+    </div>
+</div>            </div>
 
             @if ($variant)
                 <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">

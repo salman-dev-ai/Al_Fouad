@@ -12,6 +12,8 @@
                 ['account', 'نظرة عامة', 'layout-dashboard', true],
                 ['account.profile', 'بياناتي', 'user', false],
                 ['account.addresses', 'عناويني', 'map-pin', false],
+                ['account.orders', 'طلباتي', 'package', false],
+                ['favorites', 'المفضلة', 'heart', false],
                 ['account.password', 'كلمة المرور', 'lock', false],
             ] as [$routeName, $label, $icon, $exact])
                 <a href="{{ route($routeName) }}" wire:navigate

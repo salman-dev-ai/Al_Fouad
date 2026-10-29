@@ -24,6 +24,9 @@
 </head>
 
 <body class="flex min-h-dvh flex-col bg-white text-ink antialiased">
+{{-- مكوّن مزامنة المفضلة (غير مرئي) --}}
+<livewire:store.favorites />
+
     <a href="#main"
         class="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-brand-700 focus:px-4 focus:py-2 focus:text-white">
         تخطَّ إلى المحتوى
@@ -47,6 +50,17 @@
                 aria-current="page" @endif @class(['rounded-md px-3 py-2 hover:bg-brand-50', 'text-brand-700' => request()->routeIs('products.*')])>
                     المنتجات
                 </a>
+
+                {{-- رابط المفضلة مع عدّاد يتحدث فورًا عند إضافة أو إزالة أي منتج. --}}
+<a href="{{ route('favorites') }}" wire:navigate
+   x-data="{ n: window.Favorites?.count() ?? 0 }"
+   @favorites-changed.window="n = window.Favorites.count()"
+   class="relative inline-flex items-center rounded-md px-3 py-2 hover:bg-brand-50">
+    <x-lucide-heart class="size-5" aria-hidden="true" />
+    <span class="sr-only">المفضلة</span>
+    <span x-show="n > 0" x-cloak x-text="n"
+          class="absolute -top-0.5 -end-0.5 min-w-5 rounded-full bg-brand-700 px-1 text-center text-xs font-bold leading-5 text-white"></span>
+</a>
 
                 <livewire:store.cart-count />
 

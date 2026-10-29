@@ -1,1 +1,1 @@
-//
+import './favorites';

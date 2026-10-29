@@ -78,6 +78,8 @@ public function execute(Cart $cart, array $data, ?User $user = null): Order    {
                 'tax_amount' => Money::fromMinor($summary->taxMinor),
                 'delivery_fee' => Money::fromMinor($summary->deliveryFeeMinor),
                 'total' => Money::fromMinor($summary->totalMinor),
+                // عملة المحل وقت الشراء، تُحفظ مع الطلب كنسخة ثابتة.
+'currency_code' => StoreSetting::current()?->currency_code ?? 'YER',
                 'payment_method' => PaymentMethod::CashOnDelivery,
                 'status' => OrderStatus::Pending,
             ]);

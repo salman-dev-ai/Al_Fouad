@@ -26,6 +26,8 @@ class Order extends Model
         'status',
         'payment_method' => PaymentMethod::class,
         'user_id',
+
+        'currency_code',
     ];
 
     protected function casts(): array

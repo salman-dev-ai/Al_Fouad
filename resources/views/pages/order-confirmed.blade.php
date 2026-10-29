@@ -29,12 +29,13 @@ new #[Title('تم استلام طلبك')] class extends Component {
         return $order;
     }
 
-    #[Computed]
-    public function currency(): string
-    {
-        return StoreSetting::current()?->currency_code ?? 'YER';
-    }
-
+ // عملة الطلب المحفوظة معه، وإن غابت (طلب قديم جدًا) فعملة المحل الحالية.
+// تُستعمل في عرض المبالغ وفي رسالة واتساب.
+#[Computed]
+public function currency(): string
+{
+    return $this->order->currency_code ?: (StoreSetting::current()?->currency_code ?? 'YER');
+}
     #[Computed]
     public function whatsappUrl(): ?string
     {
@@ -124,4 +125,14 @@ new #[Title('تم استلام طلبك')] class extends Component {
         <a href="{{ route('products.index') }}" wire:navigate
            class="text-sm font-semibold text-brand-700 underline underline-offset-4">متابعة التسوق</a>
     </div>
+
+    {{-- رابط سريع لتفاصيل الطلب في الحساب، يظهر للمسجّل فقط. --}}
+@auth
+    @if ($order->user_id === auth()->id())
+        <p class="mt-3 text-center">
+            <a href="{{ route('account.orders.show', ['number' => $order->order_number]) }}" wire:navigate
+               class="text-sm font-semibold text-brand-700 underline underline-offset-4">عرض الطلب في حسابي</a>
+        </p>
+    @endif
+@endauth
 </div>

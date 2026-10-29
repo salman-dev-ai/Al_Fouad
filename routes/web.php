@@ -27,3 +27,19 @@ Route::livewire('/account/password', 'pages::account-password')->middleware('aut
 // صفحة عناوين الشحن للمسجّلين فقط.
 // تستعمل إطار الحساب المشترك وكلاس AddressForm.
 Route::livewire('/account/addresses', 'pages::account-addresses')->middleware('auth')->name('account.addresses');
+
+// طلبات العميل: القائمة وتفاصيل طلب بعينه، للمسجّلين فقط.
+// رقم الطلب في الرابط يُقيَّد بحروف وأرقام وشرطة، ويُبحث عنه ضمن طلبات المستخدم فقط.
+// أي رقم لا يخصه يعطي 404.
+Route::livewire('/account/orders', 'pages::account-orders')->middleware('auth')->name('account.orders');
+Route::livewire('/account/orders/{number}', 'pages::account-order')
+    ->middleware('auth')
+    ->where('number', '[A-Za-z0-9\-]+')
+    ->name('account.orders.show');
+
+    // صفحة المفضلة عامة: المسجّل يرى مفضلة حسابه، والزائر يرى مفضلة متصفحه.
+Route::livewire('/favorites', 'pages::favorites')->name('favorites');
+
+
+
+

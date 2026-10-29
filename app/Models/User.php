@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[Fillable(['name', 'email', 'password','phone'])]
 #[Hidden(['password', 'remember_token'])]
@@ -55,5 +56,13 @@ public function addresses(): HasMany
 public function orders(): HasMany
 {
     return $this->hasMany(Order::class);
+}
+
+
+// المنتجات المفضلة لهذا الحساب (عبر جدول favorites)، مع تاريخ الإضافة.
+// تُستعمل لعرض صفحة المفضلة ولحفظ/حذف المفضلة من مكوّن المزامنة.
+public function favoriteProducts(): BelongsToMany
+{
+    return $this->belongsToMany(Product::class, 'favorites')->withTimestamps();
 }
 }

@@ -24,6 +24,21 @@ new #[Title('حسابي')] class extends Component {};
         <span class="text-sm text-ink-soft">عناوين الشحن المحفوظة</span>
     </a>
 </li>
+<li>
+    <a href="{{ route('account.orders') }}" wire:navigate
+       class="block rounded-lg border border-line p-5 hover:border-brand-500">
+        <span class="block font-extrabold">طلباتي</span>
+        <span class="text-sm text-ink-soft">تابع حالة طلباتك وتفاصيلها</span>
+    </a>
+</li>
+
+<li>
+    <a href="{{ route('favorites') }}" wire:navigate
+       class="block rounded-lg border border-line p-5 hover:border-brand-500">
+        <span class="block font-extrabold">المفضلة</span>
+        <span class="text-sm text-ink-soft">المنتجات التي حفظتها</span>
+    </a>
+</li>
         <li>
             <a href="{{ route('account.password') }}" wire:navigate
                class="block rounded-lg border border-line p-5 hover:border-brand-500">

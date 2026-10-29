@@ -23,6 +23,8 @@ $moreColors = max(0, $swatches->count() - $dots->count());
 @endphp
 
 <article {{ $attributes->class(['group relative flex flex-col']) }}>
+{{-- قلب المفضلة فوق الصورة، فوق الرابط الممتد للبطاقة (z-10). --}}
+<x-store.favorite-button :product="$product" class="absolute end-2 top-2 z-10" />
     <a href="{{ route('products.show', ['product' => $product->slug]) }}" wire:navigate
         class="relative block aspect-3/4 overflow-hidden rounded-lg bg-brand-50">
         @if ($image)
