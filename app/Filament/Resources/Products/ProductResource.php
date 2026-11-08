@@ -21,8 +21,7 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-package';
 
     protected static ?string $modelLabel = 'منتج';
 
@@ -43,6 +42,16 @@ class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return ProductsTable::configure($table);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) Product::query()->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
     }
 
     public static function getRelations(): array

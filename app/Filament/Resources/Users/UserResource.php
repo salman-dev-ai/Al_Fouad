@@ -19,7 +19,7 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserCircle;
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-user-round';
 
     protected static ?string $modelLabel = 'حساب عميل';
 
@@ -48,6 +48,16 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return UsersTable::configure($table);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) User::query()->where('is_admin', false)->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'gray';
     }
 
     public static function getPages(): array

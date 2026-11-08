@@ -28,13 +28,15 @@ class ManageStoreSettings extends Page
 {
     protected string $view = 'filament.pages.manage-store-settings';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-settings';
 
     protected static string|UnitEnum|null $navigationGroup = 'الإعدادات';
 
     protected static ?string $navigationLabel = 'إعدادات المحل';
 
     protected static ?string $title = 'إعدادات المحل';
+
+    protected static ?int $navigationSort = 10;
 
     /** @var array<string, mixed>|null */
     public ?array $data = [];

@@ -18,12 +18,11 @@ use Filament\Tables\Table;
 use UnitEnum;
 class CategoryResource extends Resource
 {
-   
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
 
-        protected static ?string $modelLabel = 'تصنيف';
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-folder-tree';
+
+    protected static ?string $modelLabel = 'تصنيف';
 
     protected static ?string $pluralModelLabel = 'التصنيفات';
 
@@ -31,7 +30,7 @@ class CategoryResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'الكتالوج';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
     public static function form(Schema $schema): Schema
     {
         return CategoryForm::configure($schema);
@@ -40,6 +39,16 @@ class CategoryResource extends Resource
     public static function table(Table $table): Table
     {
         return CategoriesTable::configure($table);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) Category::query()->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'info';
     }
 
     public static function getRelations(): array

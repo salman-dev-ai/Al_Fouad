@@ -19,9 +19,9 @@ class AdvertisementResource extends Resource
 {
     protected static ?string $model = Advertisement::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-megaphone';
 
-        protected static ?string $modelLabel = 'إعلان';
+    protected static ?string $modelLabel = 'إعلان';
 
     protected static ?string $pluralModelLabel = 'الإعلانات';
 
@@ -29,7 +29,7 @@ class AdvertisementResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'التسويق';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
     {

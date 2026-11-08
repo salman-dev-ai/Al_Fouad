@@ -23,13 +23,17 @@ class ReviewSettingsPage extends Page implements HasSchemas
 {
     use InteractsWithSchemas;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-sliders-horizontal';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'الإعدادات';
 
     protected static ?string $navigationLabel = 'إعدادات التقييمات';
 
     protected static ?string $title = 'إعدادات التقييمات';
 
     protected static ?string $slug = 'review-settings';
+
+    protected static ?int $navigationSort = 20;
 
     public ?array $data = [];
 

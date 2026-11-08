@@ -18,7 +18,13 @@ class StockAlertResource extends Resource
 {
     protected static ?string $model = StockAlert::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-bell-ring';
+
+    protected static ?string $navigationLabel = 'تنبيهات التوفر';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'الكتالوج';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
@@ -28,6 +34,16 @@ class StockAlertResource extends Resource
     public static function table(Table $table): Table
     {
         return StockAlertsTable::configure($table);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) StockAlert::query()->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
     }
 
     public static function getRelations(): array
@@ -61,7 +77,7 @@ class StockAlertResource extends Resource
         return 'تنبيهات التوفر';
     }
 
-    
+
 
     public static function getPages(): array
     {

@@ -25,7 +25,7 @@ class PartnerResource extends Resource
 {
     protected static ?string $model = Partner::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-building-2';
 
     protected static string|UnitEnum|null $navigationGroup = 'صفحة «قصتنا»';
 
@@ -35,7 +35,7 @@ class PartnerResource extends Resource
 
     protected static ?string $pluralModelLabel = 'الشركاء';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 20;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -77,6 +77,16 @@ class PartnerResource extends Resource
                 ToggleColumn::make('is_active')->label('ظاهر'),
             ])
             ->recordActions([EditAction::make(), DeleteAction::make()]);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) Partner::query()->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'info';
     }
 
     public static function getPages(): array

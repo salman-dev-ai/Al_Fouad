@@ -19,11 +19,9 @@ class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-users';
 
-
-
-        protected static ?string $modelLabel = 'عميل';
+    protected static ?string $modelLabel = 'عميل';
 
     protected static ?string $pluralModelLabel = 'العملاء';
 
@@ -31,7 +29,7 @@ class CustomerResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'المبيعات';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     public static function canCreate(): bool
     {
@@ -45,6 +43,16 @@ class CustomerResource extends Resource
     public static function table(Table $table): Table
     {
         return CustomersTable::configure($table);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) Customer::query()->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'primary';
     }
 
     public static function getRelations(): array

@@ -19,7 +19,7 @@ class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingBag;
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-shopping-bag';
 
     protected static ?string $modelLabel = 'طلب';
 
@@ -29,7 +29,7 @@ class OrderResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'المبيعات';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'order_number';
 

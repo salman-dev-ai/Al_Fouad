@@ -27,7 +27,7 @@ class TestimonialResource extends Resource
 {
     protected static ?string $model = Testimonial::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-message-square-text';
 
     protected static string|UnitEnum|null $navigationGroup = 'صفحة «قصتنا»';
 
@@ -37,7 +37,7 @@ class TestimonialResource extends Resource
 
     protected static ?string $pluralModelLabel = 'آراء العملاء';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 30;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -81,6 +81,16 @@ class TestimonialResource extends Resource
                 ToggleColumn::make('is_active')->label('ظاهر'),
             ])
             ->recordActions([EditAction::make(), DeleteAction::make()]);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) Testimonial::query()->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'primary';
     }
 
     public static function getPages(): array

@@ -28,7 +28,7 @@ class BranchResource extends Resource
 {
     protected static ?string $model = Branch::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-map-pin';
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-map-pin';
 
     protected static string|UnitEnum|null $navigationGroup = 'صفحة «قصتنا»';
 
@@ -38,7 +38,7 @@ class BranchResource extends Resource
 
     protected static ?string $pluralModelLabel = 'الفروع';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 40;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -91,6 +91,16 @@ class BranchResource extends Resource
                 ToggleColumn::make('is_active')->label('ظاهر'),
             ])
             ->recordActions([EditAction::make(), DeleteAction::make()]);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) Branch::query()->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
     }
 
     public static function getPages(): array
