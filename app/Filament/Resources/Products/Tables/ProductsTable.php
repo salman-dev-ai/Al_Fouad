@@ -22,7 +22,8 @@ class ProductsTable
             ->columns([
                 ImageColumn::make('primaryImage.image_path')
                     ->label('الصورة')
-                    ->disk('public'),
+                    ->disk('public')
+                    ->circular(),
 
                 TextColumn::make('name')
                     ->label('الاسم')

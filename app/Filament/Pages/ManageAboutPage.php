@@ -261,18 +261,25 @@ class ManageAboutPage extends Page
     // حقل صورة موحّد: PNG/JPG/WebP فقط، حد الحجم 2MB، وتصغير في المتصفح قبل الرفع على قرص public.
     // وضع contain يحفظ نسبة الصورة (لا اقتصاص)، والأبعاد الهدف تمنع رفع صور ضخمة تبطئ الصفحة.
     // يُستعمل لصور الغلاف والقصة هنا، وتكرر الموارد الأخرى نفس الإعدادات.
-    private static function imageField(string $name, string $label, string $directory, int $width, int $height, int $maxKb = 2048): FileUpload
-    {
-        return FileUpload::make($name)
-            ->label($label)
-            ->image()
-            ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/webp'])
-            ->disk('public')
-            ->directory($directory)
-            ->visibility('public')
-            ->maxSize($maxKb)
-            ->imageResizeMode('contain')
-            ->imageResizeTargetWidth((string) $width)
-            ->imageResizeTargetHeight((string) $height);
-    }
+   private static function imageField(
+    string $name,
+    string $label,
+    string $directory,
+    int $width,
+    int $height,
+    int $maxKb = 5120
+): FileUpload {
+    return FileUpload::make($name)
+        ->label($label)
+        ->image()
+        ->acceptedFileTypes([
+            'image/jpeg',
+            'image/png',
+            'image/webp',
+        ])
+        ->disk('public')
+        ->directory($directory)
+        ->visibility('public')
+        ->maxSize($maxKb);
+}
 }

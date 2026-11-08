@@ -34,9 +34,17 @@ class ColorsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema
+         ->columns(1) // عمود واحد: كل قسم يأخذ العرض كاملًا ولا يوجد فراغ
+        ->components([
             Section::make('اللون')
-                ->columns(2)
+            ->columnSpanFull()
+
+                ->compact()
+                ->columns([
+                    'default' => 1,
+                    'sm' => 2,
+                ])
                 ->schema([
                     TextInput::make('name')
                         ->label('اسم اللون')
@@ -59,8 +67,10 @@ class ColorsRelationManager extends RelationManager
 
             Section::make('صور هذا اللون')
                 ->description('تظهر للعميل عند اختيار هذا اللون فقط. رتّبها بالسحب، وحدّد رئيسية واحدة.')
+                ->compact()
                 ->schema([
                     Repeater::make('images')
+                     ->columns(['default' => 1, 'md' => 3])
                         ->hiddenLabel()
                         ->relationship()
                         ->orderColumn('sort_order')
@@ -68,7 +78,10 @@ class ColorsRelationManager extends RelationManager
                         ->collapsible()
                         ->addActionLabel('إضافة صورة')
                         ->maxItems(10)
-                        ->columns(3)
+                        ->columns([
+                            'default' => 1,
+                            'md' => 3,
+                        ])
                         ->schema([
                             FileUpload::make('image_path')
                                 ->label('الصورة')
@@ -78,6 +91,7 @@ class ColorsRelationManager extends RelationManager
                                 ->visibility('public')
                                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                 ->maxSize(2048)
+                                ->imagePreviewHeight('140')
                                 ->required(),
 
                             TextInput::make('alt_text')
@@ -86,6 +100,7 @@ class ColorsRelationManager extends RelationManager
 
                             Toggle::make('is_primary')
                                 ->label('الصورة الرئيسية')
+                                ->inline(false)
                                 ->distinct()
                                 ->fixIndistinctState(),
                         ]),
@@ -93,8 +108,10 @@ class ColorsRelationManager extends RelationManager
 
             Section::make('المقاسات والمخزون')
                 ->description('سعر ومخزون كل مقاس من هذا اللون.')
+                ->compact()
                 ->schema([
                     Repeater::make('variants')
+                     ->columns(['default' => 1, 'sm' => 2, 'lg' => 5])
                         ->hiddenLabel()
                         ->relationship()
                         ->minItems(1)
@@ -102,7 +119,12 @@ class ColorsRelationManager extends RelationManager
                         ->collapsible()
                         ->cloneable()
                         ->addActionLabel('إضافة مقاس')
-                        ->columns(5)
+                        ->columns([
+                            'default' => 1,
+                            'sm' => 2,
+                            'lg' => 3,
+                            'xl' => 5,
+                        ])
                         ->itemLabel(fn (array $state): ?string => $state['size'] ?? null)
                         ->rules([
                             fn (): Closure => function (string $attribute, $value, Closure $fail): void {
@@ -160,11 +182,21 @@ class ColorsRelationManager extends RelationManager
             ->columns([
                 ColorColumn::make('hex')->label('الدرجة'),
 
-                TextColumn::make('name')->label('اللون')->weight('bold'),
+                TextColumn::make('name')
+                    ->label('اللون')
+                    ->weight('bold')
+                    ->wrap(),
 
-                TextColumn::make('images_count')->label('الصور')->counts('images'),
+                // على الجوال تُخفى الأعمدة الثانوية ويبقى اللون والمخزون
+                TextColumn::make('images_count')
+                    ->label('الصور')
+                    ->counts('images')
+                    ->visibleFrom('md'),
 
-                TextColumn::make('variants_count')->label('المقاسات')->counts('variants'),
+                TextColumn::make('variants_count')
+                    ->label('المقاسات')
+                    ->counts('variants')
+                    ->visibleFrom('md'),
 
                 TextColumn::make('variants_sum_stock_quantity')
                     ->label('إجمالي المخزون')
@@ -172,12 +204,21 @@ class ColorsRelationManager extends RelationManager
                     ->default(0),
             ])
             ->headerActions([
-                CreateAction::make()->label('إضافة لون')->modalWidth(Width::FiveExtraLarge),
+                CreateAction::make()
+                    ->label('إضافة لون')
+                    ->modalWidth(Width::FiveExtraLarge),
             ])
             ->recordActions([
-                EditAction::make()->label('تعديل')->modalWidth(Width::FiveExtraLarge),
+                EditAction::make()
+                    ->label('تعديل')
+                    ->iconButton()
+                    ->tooltip('تعديل')
+                    ->modalWidth(Width::FiveExtraLarge),
+
                 DeleteAction::make()
                     ->label('حذف')
+                    ->iconButton()
+                    ->tooltip('حذف')
                     ->modalDescription('سيُحذف اللون مع مقاساته وصوره. الطلبات السابقة تبقى كما هي.'),
             ])
             ->emptyStateHeading('لا توجد ألوان بعد')

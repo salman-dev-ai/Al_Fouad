@@ -25,7 +25,7 @@ class ProductForm
         return $schema
             ->components([
                 Section::make('معلومات المنتج')
-                    ->columns(2)
+                    
                     ->schema([
                         TextInput::make('name')
                             ->label('اسم المنتج')
@@ -92,7 +92,7 @@ class ProductForm
                                     ->disk('public')
                                     ->directory('products')
                                     ->visibility('public')
-                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                    // ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                     ->maxSize(2048)
                                     ->required(),
 
