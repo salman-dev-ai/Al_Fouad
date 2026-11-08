@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\FlushesAboutCache;
 
 class StoreSetting extends Model
 {
+
+    use FlushesAboutCache;
     protected $fillable = [
         'phone',
         'whatsapp_phone',

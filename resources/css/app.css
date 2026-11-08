@@ -66,3 +66,109 @@
         scroll-behavior: auto !important;
     }
 }
+
+
+
+
+/* شريط الإعلان المتحرك: تمرير مستمر بسرعة ثابتة، يتوقف عند المرور، وتتلاشى حافتاه. */
+.announce-mask {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+
+.announce-track {
+    animation: announce-scroll var(--announce-duration, 30s) linear infinite;
+    will-change: transform;
+}
+
+.announce:hover .announce-track,
+.announce:focus-within .announce-track {
+    animation-play-state: paused;
+}
+
+/* RTL: يتحرك المحتوى يمينًا (باتجاه القراءة العربية)، وLTR يتحرك يسارًا. */
+@keyframes announce-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(50%); }
+}
+
+[dir="ltr"] .announce-track {
+    animation-name: announce-scroll-ltr;
+}
+
+@keyframes announce-scroll-ltr {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* تقليل الحركة: نص واحد ثابت في الوسط بلا تحريك. */
+@media (prefers-reduced-motion: reduce) {
+    .announce-track {
+        animation: none;
+        width: 100%;
+    }
+
+    .announce-group[aria-hidden="true"],
+    .announce-group > span:not(:first-child) {
+        display: none;
+    }
+
+    .announce-group {
+        justify-content: center;
+    }
+
+    .announce-group > span > span:last-child {
+        display: none;
+    }
+}
+
+
+/* شريط شعارات متحرك لا نهائي (RTL): نسخة مكررة من القائمة، ويتحرك المسار نصف عرضه ثم يعود فتبدو الحركة متصلة.
+   يتوقف عند مرور الفأرة، ويُلغى كليًا لمن فعّل «تقليل الحركة» (ويصير الشريط قابلًا للتمرير).
+   مدة الحركة تأتي من الصفحة (animation-duration) بحسب عدد الشعارات. */
+@keyframes fouad-marquee {
+    to { transform: translateX(50%); }
+}
+
+.marquee-track {
+    animation: fouad-marquee 45s linear infinite;
+}
+
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+        animation: none;
+    }
+}
+
+
+/* زر السلة داخل الهيدر الجديد: يُظهر رابط مكوّن cart-count كدائرة بيضاء الحدود على الأخضر. */
+.hdr-cart a {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border-radius: 9999px;
+    border: 1px solid rgb(255 255 255 / 0.25);
+    background: transparent;
+    color: #fff;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+@media (min-width: 640px) {
+    .hdr-cart a { width: 2.75rem; height: 2.75rem; }
+}
+
+.hdr-cart a:hover { background: rgb(255 255 255 / 0.15); transform: scale(1.05); }
+.hdr-cart a:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .hdr-cart a { transition: none; }
+    .hdr-cart a:hover { transform: none; }
+}

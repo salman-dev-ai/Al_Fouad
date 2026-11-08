@@ -24,6 +24,9 @@
 </head>
 
 <body class="flex min-h-dvh flex-col bg-white text-ink antialiased">
+
+    {{-- بيانات الربط بصفحة «قصتنا» (مدخل كاش صغير، تُقرأ مرة واحدة وتُمرَّر للرأس والتذييل). --}}
+@php($about = app(\App\Actions\About\BuildAboutPageData::class)->footer())
 {{-- مكوّن مزامنة المفضلة (غير مرئي) --}}
 <livewire:store.favorites />
 
@@ -34,53 +37,71 @@
 
     <x-store.announcement-bar />
 
-    <header class="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
-        <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-            <a href="{{ route('home') }}" aria-label="{{ config('app.name') }} - الصفحة الرئيسية">
-                <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" width="95" height="40"
-                    class="h-10 w-auto">
-            </a>
+    <header class="sticky top-0 z-40 mb-9   ">
+    {{-- الخلفية الخضراء بحافة سفلية مستديرة وأوراق زخرفية (قصّ داخلي حتى لا يُقصّ الشعار). --}}
+    <div class="absolute inset-0 overflow-hidden rounded-b-[2rem] bg-[linear-gradient(180deg,#0b6b4b,#4CA542)] shadow-[0_10px_30px_-12px_rgba(0,70,50,.55)]" aria-hidden="true">
+        {{-- <x-lucide-leaf class="absolute -start-3 -top-2 size-24 rotate-12 text-white/10 max-sm:hidden" />
+        <x-lucide-sprout class="absolute -end-2 top-1 size-20 -rotate-12 text-white/10 max-sm:hidden" /> --}}
+    </div>
 
-            <nav aria-label="التنقل الرئيسي" class="flex items-center gap-1 text-sm font-semibold">
-                <a href="{{ route('home') }}" wire:navigate @if (request()->routeIs('home')) aria-current="page" @endif
-                    @class(['rounded-md px-3 py-2 hover:bg-brand-50', 'text-brand-700' => request()->routeIs('home')])>
-                    الرئيسية
-                </a>
-                <a href="{{ route('products.index') }}" wire:navigate @if (request()->routeIs('products.*'))
-                aria-current="page" @endif @class(['rounded-md px-3 py-2 hover:bg-brand-50', 'text-brand-700' => request()->routeIs('products.*')])>
-                    المنتجات
-                </a>
+    {{-- تجويف منحنٍ حول الشعار يكمل لون الشريط (زخرفة فقط). --}}
+    <svg class="pointer-events-none absolute left-1/2 top-[calc(4.5rem-1px)] z-0 h-auto w-[300px] -translate-x-1/2 sm:w-[340px]"
+         viewBox="0 0 340 28" fill="#004632" aria-hidden="true">
+        <path d="M0 0H340C280 0 250 3 232 14C215 24 195 28 170 28C145 28 125 24 108 14C90 3 60 0 0 0Z" />
+    </svg>
 
-                {{-- رابط المفضلة مع عدّاد يتحدث فورًا عند إضافة أو إزالة أي منتج. --}}
-<a href="{{ route('favorites') }}" wire:navigate
-   x-data="{ n: window.Favorites?.count() ?? 0 }"
-   @favorites-changed.window="n = window.Favorites.count()"
-   class="relative inline-flex items-center rounded-md px-3 py-2 hover:bg-brand-50">
-    <x-lucide-heart class="size-5" aria-hidden="true" />
-    <span class="sr-only">المفضلة</span>
-    <span x-show="n > 0" x-cloak x-text="n"
-          class="absolute -top-0.5 -end-0.5 min-w-5 rounded-full bg-brand-700 px-1 text-center text-xs font-bold leading-5 text-white"></span>
-</a>
+    <div class="relative z-10 mx-auto grid h-[4.5rem] max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 sm:px-6 lg:px-8">
 
+        {{-- الجهة الأولى (يمين في RTL): تنقل --}}
+        <nav aria-label="التنقل الرئيسي" class="flex items-center justify-start gap-1.5 sm:gap-3">
+            <x-store.nav-icon :href="route('home')" icon="house" label="الرئيسية" :active="request()->routeIs('home')" />
+            <x-store.nav-icon :href="route('products.index')" icon="shirt" label="المنتجات" :active="request()->routeIs('products.*')" />
+
+            @if ($about['published'])
+                <div class="max-md:hidden">
+                    <x-store.nav-icon :href="route('about')" icon="book-heart" label="قصتنا" :active="request()->routeIs('about')" />
+                </div>
+            @endif
+
+            {{-- المفضلة: العدّاد يتحدث فورًا عند الإضافة أو الإزالة --}}
+            <x-store.nav-icon :href="route('favorites')" icon="heart" label="المفضلة" :active="request()->routeIs('favorites')"
+                              x-data="{ n: window.Favorites?.count() ?? 0 }"
+                              x-on:favorites-changed.window="n = window.Favorites.count()">
+                <span x-show="n > 0" x-cloak x-text="n"
+                      class="absolute -end-1.5 -top-1.5 min-w-5 rounded-full bg-brand-500 px-1 text-center text-xs font-bold leading-5 text-white ring-2 ring-[#004632]"></span>
+            </x-store.nav-icon>
+        </nav>
+
+        {{-- الشعار الدائري في الوسط --}}
+        <a href="{{ route('home') }}" wire:navigate aria-label="{{ config('app.name') }} - الصفحة الرئيسية"
+           class="relative z-10 grid size-20 translate-y-6 place-items-center rounded-full bg-white shadow-xl ring-4 ring-white/25 transition hover:scale-105 motion-reduce:transition-none sm:size-24 sm:translate-y-5">
+            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" width="95" height="40"
+                 class="h-7 w-auto max-w-[75%] sm:h-9">
+        </a>
+
+        {{-- الجهة الثانية (يسار في RTL): السلة والحساب --}}
+        <div class="flex items-center justify-end gap-1.5 sm:gap-3">
+            {{-- السلة: مكوّن الليفواير نفسه ملفوف بتسمية، وتُنسَّق أيقونته بالـ CSS (hdr-cart). --}}
+            <div class="group hdr-cart relative">
                 <livewire:store.cart-count />
+                <span role="tooltip"
+                      class="pointer-events-none absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-ink px-3 py-1.5 text-xs font-bold text-white opacity-0 shadow-lg transition motion-reduce:transition-none group-focus-within:opacity-100 group-hover:opacity-100">السلة</span>
+            </div>
 
-                {{-- يعرض «حسابي» للمسجّل و«دخول» للزائر. --}}
-@auth
-    <a href="{{ route('account') }}" wire:navigate class="rounded-md px-3 py-2 text-sm font-bold hover:bg-brand-50">حسابي</a>
-@else
-    <a href="{{ route('login') }}" wire:navigate class="rounded-md px-3 py-2 text-sm font-bold hover:bg-brand-50">دخول</a>
-@endauth
-            </nav>
-
+            @auth
+                <x-store.nav-icon :href="route('account')" icon="circle-user-round" label="حسابي" :active="request()->routeIs('account*')" />
+            @else
+                <x-store.nav-icon :href="route('login')" icon="circle-user-round" label="تسجيل الدخول" :active="request()->routeIs('login')" />
+            @endauth
         </div>
-    </header>
+    </div>
+</header>
 
     <main id="main" class="flex-1">
         {{ $slot }}
     </main>
 
-    <x-store.footer />
-
+<x-store.footer :about="$about" />
     @livewireScripts
 </body>
 

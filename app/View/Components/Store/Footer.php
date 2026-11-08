@@ -10,11 +10,16 @@ class Footer extends Component
 {
     public ?StoreSetting $settings;
 
-    public function __construct()
+      // بيانات الربط بصفحة «قصتنا» (من القالب): النشر، أيام الاسترجاع، الفروع، وأسماء طرق الدفع.
+    // القيمة الافتراضية فارغة فيبقى المكوّن سليمًا إن استُدعي بدونها.
+    // لا يقرأ التذييل قاعدة البيانات لها، فالبيانات جاهزة من الكاش.
+    public array $about = [];
+
+    public function __construct(array $about = [])
     {
+        $this->about = $about;
         $this->settings = StoreSetting::current();
     }
-
     public function telUrl(): ?string
     {
         $phone = preg_replace('/[^\d+]/', '', (string) $this->settings?->phone);

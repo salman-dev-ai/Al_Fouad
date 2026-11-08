@@ -40,6 +40,9 @@ Route::livewire('/account/orders/{number}', 'pages::account-order')
     // صفحة المفضلة عامة: المسجّل يرى مفضلة حسابه، والزائر يرى مفضلة متصفحه.
 Route::livewire('/favorites', 'pages::favorites')->name('favorites');
 
-
+// صفحة «قصتنا»: عامة، وتعيد 404 إن لم تُنشر من الإدارة.
+// محتواها من الكاش فلا عبء على قاعدة البيانات.
+// الاسم about يُستعمل في القوائم والتذييل لاحقًا.
+Route::livewire('/about', 'pages::about')->name('about');
 
 

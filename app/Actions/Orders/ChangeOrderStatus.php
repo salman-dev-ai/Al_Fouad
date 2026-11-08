@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\ProductVariant;
 use DomainException;
 use Illuminate\Support\Facades\DB;
+use App\Models\StockAlert;
 
 class ChangeOrderStatus
 {
@@ -36,15 +37,17 @@ class ChangeOrderStatus
 
             return $locked;
         });
-    }
-
+    }    // يعيد كمية كل عنصر في الطلب الملغى إلى مخزون خياره، بزيادة ذرّية على مستوى قاعدة البيانات.
+    // الزيادة بالاستعلام لا تُطلق مراقب الموديل، فنعلّم تنبيهات «أبلغني عند التوفر» لهذا الخيار يدويًا.
+    // تُستدعى فقط عند الانتقال إلى «ملغي»، وبداخل نفس المعاملة.
     private function restoreStock(Order $order): void
     {
         foreach ($order->items()->whereNotNull('product_variant_id')->get() as $item) {
-            // increment ذرّية على مستوى قاعدة البيانات، ولا تعتمد على قيمة قديمة في الذاكرة
             ProductVariant::query()
                 ->whereKey($item->product_variant_id)
                 ->increment('stock_quantity', $item->quantity);
+
+            StockAlert::markAvailable((int) $item->product_variant_id);
         }
     }
-} 
+}
