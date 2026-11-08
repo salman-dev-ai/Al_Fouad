@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Components\Store;
+namespace App\View\Components\Layout;
 
 use App\Models\StoreSetting;
 use Illuminate\Contracts\View\View;
@@ -75,6 +75,6 @@ class Footer extends Component
 
     public function render(): View|\Closure|string
     {
-        return view('components.store.footer');
+        return view('components.layout.footer');
     }
 }

@@ -58,11 +58,11 @@ new #[Title('بياناتي')] class extends Component {
 };
 ?>
 
-<x-store.account-shell heading="بياناتي">
+<x-account.shell heading="بياناتي">
     <form wire:submit="save" novalidate class="max-w-lg space-y-5 rounded-lg border border-line p-6">
-        <x-store.field name="name" label="الاسم الكامل" required autocomplete="name" wire:model="name" />
+        <x-ui.field name="name" label="الاسم الكامل" required autocomplete="name" wire:model="name" />
 
-        <x-store.field name="email" label="البريد الإلكتروني" type="email" dir="ltr"
+        <x-ui.field name="email" label="البريد الإلكتروني" type="email" dir="ltr"
                        autocomplete="email" wire:model="email" />
 
         <div>
@@ -85,4 +85,4 @@ new #[Title('بياناتي')] class extends Component {
             @endif
         </div>
     </form>
-</x-store.account-shell>
+</x-account.shell>

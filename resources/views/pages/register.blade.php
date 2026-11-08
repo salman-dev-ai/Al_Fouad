@@ -116,19 +116,19 @@ public function mount(): void
     <p class="mt-2 text-sm text-ink-soft">احفظ بياناتك وعناوينك لتُكمل طلباتك بأسرع وقت.</p>
 
     <form wire:submit="register" novalidate class="mt-6 space-y-5 rounded-lg border border-line p-6">
-        <x-store.field name="name" label="الاسم الكامل" required autocomplete="name" wire:model="name" />
+        <x-ui.field name="name" label="الاسم الكامل" required autocomplete="name" wire:model="name" />
 
-        <x-store.field name="phone" label="رقم الجوال" required type="tel" inputmode="tel" dir="ltr"
+        <x-ui.field name="phone" label="رقم الجوال" required type="tel" inputmode="tel" dir="ltr"
                        placeholder="777123456" autocomplete="tel" wire:model="phone"
                        helper="تدخل به إلى حسابك، وسنتواصل معك عليه بشأن طلباتك." />
 
-        <x-store.field name="email" label="البريد الإلكتروني" type="email" dir="ltr"
+        <x-ui.field name="email" label="البريد الإلكتروني" type="email" dir="ltr"
                        autocomplete="email" wire:model="email" />
 
-        <x-store.field name="password" label="كلمة المرور" required type="password" dir="ltr"
+        <x-ui.field name="password" label="كلمة المرور" required type="password" dir="ltr"
                        autocomplete="new-password" helper="8 أحرف على الأقل." wire:model="password" />
 
-        <x-store.field name="password_confirmation" label="تأكيد كلمة المرور" required type="password" dir="ltr"
+        <x-ui.field name="password_confirmation" label="تأكيد كلمة المرور" required type="password" dir="ltr"
                        autocomplete="new-password" wire:model="password_confirmation" />
 
         <button type="submit" wire:loading.attr="disabled" wire:target="register"

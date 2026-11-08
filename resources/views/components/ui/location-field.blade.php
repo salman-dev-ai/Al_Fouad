@@ -32,7 +32,7 @@
     </button>
     <p x-show="message" x-cloak x-text="message" class="text-sm text-ink-soft" role="status"></p>
 
-    <x-store.field :name="$model" label="رابط الموقع" type="url" dir="ltr"
+    <x-ui.field :name="$model" label="رابط الموقع" type="url" dir="ltr"
                    placeholder="https://maps.app.goo.gl/..."
                    helper="يمكنك لصق رابط من تطبيق خرائط Google."
                    wire:model.blur="{{ $model }}" />

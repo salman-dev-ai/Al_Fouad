@@ -85,7 +85,7 @@ new #[Title('المفضلة')] class extends Component {
                     x-data="{ on: true }"
                     @favorites-changed.window="on = window.Favorites.has({{ $product->id }})"
                     x-show="on">
-                    <x-store.product-card :product="$product" :currency="$currency" />
+                    <x-catalog.product-card :product="$product" :currency="$currency" />
                 </li>
             @endforeach
         </ul>

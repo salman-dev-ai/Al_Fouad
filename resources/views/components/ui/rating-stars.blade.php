@@ -1,6 +1,6 @@
 {{-- نجوم عرض فقط (لا تفاعل): تُلوَّن النجمة إن بلغ التقييم ما يقارب رقمها (ربع نجمة تسامح). التقييم 0 = كل النجوم فارغة. --}}
 {{-- الوصولية: عنصر واحد role=img بوصف نصي، والنجوم نفسها مخفية عن قارئ الشاشة. --}}
-{{-- الاستعمال: <x-store.rating-stars :rating="4.5" size="size-5" />. --}}
+{{-- الاستعمال: <x-ui.rating-stars :rating="4.5" size="size-5" />. --}}
 @props(['rating' => 0, 'size' => 'size-4'])
 
 <span {{ $attributes->class('inline-flex items-center gap-0.5') }} role="img"

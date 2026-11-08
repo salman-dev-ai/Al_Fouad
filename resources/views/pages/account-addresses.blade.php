@@ -126,7 +126,7 @@ new #[Title('عناويني')] class extends Component {
 
 {{-- صفحة عناوين الشحن: قائمة العناوين مع إضافة وتعديل وحذف وتعيين افتراضي. --}}
 {{-- النموذج يظهر فوق القائمة عند الحاجة، وكل الحالة (فتح/إغلاق) في Livewire لأنها مرتبطة بالبيانات. --}}
-<x-store.account-shell heading="عناويني">
+<x-account.shell heading="عناويني">
     <div class="space-y-6">
 
         @if ($status)
@@ -146,22 +146,22 @@ new #[Title('عناويني')] class extends Component {
                     {{ $form->addressId ? 'تعديل العنوان' : 'عنوان جديد' }}
                 </h2>
 
-                <x-store.field name="form.label" label="اسم العنوان" placeholder="المنزل، العمل…" wire:model="form.label" />
+                <x-ui.field name="form.label" label="اسم العنوان" placeholder="المنزل، العمل…" wire:model="form.label" />
 
-                <x-store.field name="form.recipient_name" label="اسم المستلم" required autocomplete="name"
+                <x-ui.field name="form.recipient_name" label="اسم المستلم" required autocomplete="name"
                                wire:model="form.recipient_name" />
 
-                <x-store.field name="form.phone" label="رقم جوال المستلم" required type="tel" inputmode="tel" dir="ltr"
+                <x-ui.field name="form.phone" label="رقم جوال المستلم" required type="tel" inputmode="tel" dir="ltr"
                                placeholder="777123456" autocomplete="tel" wire:model="form.phone" />
 
-                <x-store.field name="form.city" label="المدينة" required autocomplete="address-level2" wire:model="form.city" />
+                <x-ui.field name="form.city" label="المدينة" required autocomplete="address-level2" wire:model="form.city" />
 
-                <x-store.field name="form.address_line" as="textarea" label="العنوان بالتفصيل" required
+                <x-ui.field name="form.address_line" as="textarea" label="العنوان بالتفصيل" required
                                placeholder="الحي، الشارع، أقرب معلم..." wire:model="form.address_line" />
 
-                <x-store.field name="form.notes" as="textarea" label="ملاحظات للتوصيل" wire:model="form.notes" />
+                <x-ui.field name="form.notes" as="textarea" label="ملاحظات للتوصيل" wire:model="form.notes" />
 
-                <x-store.location-field model="form.location_url" />
+                <x-ui.location-field model="form.location_url" />
 
                 <label class="flex items-center gap-2 text-sm">
                     <input type="checkbox" wire:model="form.is_default" class="size-4 rounded border-line accent-brand-600">
@@ -235,4 +235,4 @@ new #[Title('عناويني')] class extends Component {
             @endforelse
         </ul>
     </div>
-</x-store.account-shell>
+</x-account.shell>

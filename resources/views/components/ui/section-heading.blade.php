@@ -1,6 +1,6 @@
 {{-- عنوان قسم موحّد: سطر صغير ملوّن فوق عنوان كبير وخط زخرفي قصير، ويتمركز اختياريًا. --}}
 {{-- سيُعاد استعماله في الرئيسية وبقية الصفحات لثبات الهوية البصرية. --}}
-{{-- الاستعمال: <x-store.section-heading eyebrow="شركاؤنا" title="نعمل مع الأفضل" :center="true" />. --}}
+{{-- الاستعمال: <x-ui.section-heading eyebrow="شركاؤنا" title="نعمل مع الأفضل" :center="true" />. --}}
 @props(['title', 'eyebrow' => null, 'center' => false])
 
 <div @class(['max-w-2xl', 'mx-auto text-center' => $center])>

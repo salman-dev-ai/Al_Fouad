@@ -58,7 +58,7 @@ new #[Title('تفاصيل الطلب')] class extends Component {
 
 {{-- تفاصيل طلب واحد: الحالة والمراحل، الأصناف بأسعارها وقت الشراء، المبالغ، بيانات التوصيل والدفع. --}}
 {{-- كل البيانات من لقطة الطلب المحفوظة، فلا تتغير بتغيير المنتجات لاحقًا. --}}
-<x-store.account-shell heading="طلب {{ $order->order_number }}">
+<x-account.shell heading="طلب {{ $order->order_number }}">
     <div class="space-y-6">
         <a href="{{ route('account.orders') }}" wire:navigate
            class="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:underline">
@@ -68,10 +68,10 @@ new #[Title('تفاصيل الطلب')] class extends Component {
         <section class="space-y-4 rounded-lg border border-line p-5" aria-labelledby="status-heading">
             <div class="flex flex-wrap items-center justify-between gap-2">
                 <h2 id="status-heading" class="text-lg font-extrabold">حالة الطلب</h2>
-                <x-store.order-badge :status="$order->status" />
+                <x-account.order-badge :status="$order->status" />
             </div>
             <p class="text-xs text-ink-soft">تاريخ الطلب: {{ $order->created_at->translatedFormat('j F Y، h:i A') }}</p>
-            <x-store.order-progress :status="$order->status" />
+            <x-account.order-progress :status="$order->status" />
         </section>
 
         <section class="rounded-lg border border-line p-5" aria-labelledby="items-heading">
@@ -93,7 +93,7 @@ new #[Title('تفاصيل الطلب')] class extends Component {
             </ul>
 
             <div class="mt-4 border-t border-line pt-4">
-                <x-store.totals :subtotal="\App\Support\Money::toMinor($order->subtotal)"
+                <x-cart.totals :subtotal="\App\Support\Money::toMinor($order->subtotal)"
                                 :tax="\App\Support\Money::toMinor($order->tax_rate) > 0 ? \App\Support\Money::toMinor($order->tax_amount) : null"
                                 :tax-rate="$order->tax_rate"
                                 :delivery="\App\Support\Money::toMinor($order->delivery_fee)"
@@ -134,4 +134,4 @@ new #[Title('تفاصيل الطلب')] class extends Component {
             </a>
         @endif
     </div>
-</x-store.account-shell>
+</x-account.shell>

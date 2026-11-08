@@ -68,15 +68,15 @@ new #[Title('كلمة المرور')] class extends Component {
 };
 ?>
 
-<x-store.account-shell heading="كلمة المرور">
+<x-account.shell heading="كلمة المرور">
     <form wire:submit="save" novalidate class="max-w-lg space-y-5 rounded-lg border border-line p-6">
-        <x-store.field name="current_password" label="كلمة المرور الحالية" required type="password" dir="ltr"
+        <x-ui.field name="current_password" label="كلمة المرور الحالية" required type="password" dir="ltr"
                        autocomplete="current-password" wire:model="current_password" />
 
-        <x-store.field name="password" label="كلمة المرور الجديدة" required type="password" dir="ltr"
+        <x-ui.field name="password" label="كلمة المرور الجديدة" required type="password" dir="ltr"
                        autocomplete="new-password" helper="8 أحرف على الأقل." wire:model="password" />
 
-        <x-store.field name="password_confirmation" label="تأكيد كلمة المرور الجديدة" required type="password" dir="ltr"
+        <x-ui.field name="password_confirmation" label="تأكيد كلمة المرور الجديدة" required type="password" dir="ltr"
                        autocomplete="new-password" wire:model="password_confirmation" />
 
         <div class="flex items-center gap-4">
@@ -93,4 +93,4 @@ new #[Title('كلمة المرور')] class extends Component {
             @endif
         </div>
     </form>
-</x-store.account-shell>
+</x-account.shell>

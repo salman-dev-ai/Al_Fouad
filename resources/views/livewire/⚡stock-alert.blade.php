@@ -117,7 +117,7 @@ new class extends Component {
         </h2>
 
         <form wire:submit="submit" class="space-y-3" novalidate>
-            <x-store.field name="phone" label="رقم الجوال (واتساب)" type="tel" dir="ltr"
+            <x-ui.field name="phone" label="رقم الجوال (واتساب)" type="tel" dir="ltr"
                            placeholder="777123456" wire:model="phone" />
 
             <label class="flex items-start gap-2 text-sm">

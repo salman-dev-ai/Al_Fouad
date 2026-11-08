@@ -70,10 +70,10 @@ public function mount(): void
     <p class="mt-2 text-sm text-ink-soft">أدخل رقم جوالك وكلمة المرور.</p>
 
     <form wire:submit="login" novalidate class="mt-6 space-y-5 rounded-lg border border-line p-6">
-        <x-store.field name="phone" label="رقم الجوال" required type="tel" inputmode="tel" dir="ltr"
+        <x-ui.field name="phone" label="رقم الجوال" required type="tel" inputmode="tel" dir="ltr"
                        placeholder="777123456" autocomplete="tel" wire:model="phone" />
 
-        <x-store.field name="password" label="كلمة المرور" required type="password" dir="ltr"
+        <x-ui.field name="password" label="كلمة المرور" required type="password" dir="ltr"
                        autocomplete="current-password" wire:model="password" />
 
         <label class="flex items-center gap-2 text-sm">

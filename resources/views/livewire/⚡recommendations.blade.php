@@ -92,7 +92,7 @@ new class extends Component {
             <ul x-ref="track" class="mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none]">
                 @foreach ($this->products as $product)
                     <li wire:key="rec-{{ $mode }}-{{ $product->id }}" class="w-44 shrink-0 snap-start sm:w-56 lg:w-60">
-                        <x-store.product-card :product="$product" :currency="$this->currency" />
+                        <x-catalog.product-card :product="$product" :currency="$this->currency" />
                     </li>
                 @endforeach
             </ul>

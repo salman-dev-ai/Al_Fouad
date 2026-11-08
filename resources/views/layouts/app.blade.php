@@ -28,14 +28,14 @@
     {{-- بيانات الربط بصفحة «قصتنا» (مدخل كاش صغير، تُقرأ مرة واحدة وتُمرَّر للرأس والتذييل). --}}
 @php($about = app(\App\Actions\About\BuildAboutPageData::class)->footer())
 {{-- مكوّن مزامنة المفضلة (غير مرئي) --}}
-<livewire:store.favorites />
+<livewire:favorites />
 
     <a href="#main"
         class="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-brand-700 focus:px-4 focus:py-2 focus:text-white">
         تخطَّ إلى المحتوى
     </a>
 
-    <x-store.announcement-bar />
+    <x-layout.announcement-bar />
 
     <header class="sticky top-0 z-40 mb-9   ">
     {{-- الخلفية الخضراء بحافة سفلية مستديرة وأوراق زخرفية (قصّ داخلي حتى لا يُقصّ الشعار). --}}
@@ -54,22 +54,22 @@
 
         {{-- الجهة الأولى (يمين في RTL): تنقل --}}
         <nav aria-label="التنقل الرئيسي" class="flex items-center justify-start gap-1.5 sm:gap-3">
-            <x-store.nav-icon :href="route('home')" icon="house" label="الرئيسية" :active="request()->routeIs('home')" />
-            <x-store.nav-icon :href="route('products.index')" icon="shirt" label="المنتجات" :active="request()->routeIs('products.*')" />
+            <x-layout.nav-icon :href="route('home')" icon="house" label="الرئيسية" :active="request()->routeIs('home')" />
+            <x-layout.nav-icon :href="route('products.index')" icon="shirt" label="المنتجات" :active="request()->routeIs('products.*')" />
 
             @if ($about['published'])
                 <div class="max-md:hidden">
-                    <x-store.nav-icon :href="route('about')" icon="book-heart" label="قصتنا" :active="request()->routeIs('about')" />
+                    <x-layout.nav-icon :href="route('about')" icon="book-heart" label="قصتنا" :active="request()->routeIs('about')" />
                 </div>
             @endif
 
             {{-- المفضلة: العدّاد يتحدث فورًا عند الإضافة أو الإزالة --}}
-            <x-store.nav-icon :href="route('favorites')" icon="heart" label="المفضلة" :active="request()->routeIs('favorites')"
+            <x-layout.nav-icon :href="route('favorites')" icon="heart" label="المفضلة" :active="request()->routeIs('favorites')"
                               x-data="{ n: window.Favorites?.count() ?? 0 }"
                               x-on:favorites-changed.window="n = window.Favorites.count()">
                 <span x-show="n > 0" x-cloak x-text="n"
                       class="absolute -end-1.5 -top-1.5 min-w-5 rounded-full bg-brand-500 px-1 text-center text-xs font-bold leading-5 text-white ring-2 ring-[#004632]"></span>
-            </x-store.nav-icon>
+            </x-layout.nav-icon>
         </nav>
 
         {{-- الشعار الدائري في الوسط --}}
@@ -83,15 +83,15 @@
         <div class="flex items-center justify-end gap-1.5 sm:gap-3">
             {{-- السلة: مكوّن الليفواير نفسه ملفوف بتسمية، وتُنسَّق أيقونته بالـ CSS (hdr-cart). --}}
             <div class="group hdr-cart relative">
-                <livewire:store.cart-count />
+                <livewire:cart-count />
                 <span role="tooltip"
                       class="pointer-events-none absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-ink px-3 py-1.5 text-xs font-bold text-white opacity-0 shadow-lg transition motion-reduce:transition-none group-focus-within:opacity-100 group-hover:opacity-100">السلة</span>
             </div>
 
             @auth
-                <x-store.nav-icon :href="route('account')" icon="circle-user-round" label="حسابي" :active="request()->routeIs('account*')" />
+                <x-layout.nav-icon :href="route('account')" icon="circle-user-round" label="حسابي" :active="request()->routeIs('account*')" />
             @else
-                <x-store.nav-icon :href="route('login')" icon="circle-user-round" label="تسجيل الدخول" :active="request()->routeIs('login')" />
+                <x-layout.nav-icon :href="route('login')" icon="circle-user-round" label="تسجيل الدخول" :active="request()->routeIs('login')" />
             @endauth
         </div>
     </div>
@@ -101,7 +101,7 @@
         {{ $slot }}
     </main>
 
-<x-store.footer :about="$about" />
+<x-layout.footer :about="$about" />
     @livewireScripts
 </body>
 

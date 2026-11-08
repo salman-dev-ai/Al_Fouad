@@ -188,7 +188,7 @@ new
 {{-- صفحة إتمام الطلب: بيانات الاستلام (مع اختيار عنوان محفوظ للمسجّل) + الموقع + الدفع + ملخص الطلب. --}}
 {{-- المنطق كله في الخادم (PlaceOrder)، وAlpine يظهر فقط داخل مكوّن الموقع. --}}
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-    <x-store.breadcrumbs :items="[
+    <x-ui.breadcrumbs :items="[
         ['label' => 'الرئيسية', 'url' => route('home')],
         ['label' => 'سلة التسوق', 'url' => route('cart')],
         ['label' => 'إتمام الطلب'],
@@ -200,139 +200,16 @@ new
         <form wire:submit="placeOrder" novalidate class="mt-6 grid items-start gap-8 lg:grid-cols-[1fr_24rem]">
             <div class="space-y-6">
 
-                @guest
-                    <p class="rounded-lg bg-brand-50 p-4 text-sm">
-                        لديك حساب؟
-                        <a href="{{ route('login', ['next' => 'checkout']) }}" wire:navigate class="font-bold text-brand-700 underline underline-offset-4">سجّل دخولك</a>
-                        أو
-                        <a href="{{ route('register', ['next' => 'checkout']) }}" wire:navigate class="font-bold text-brand-700 underline underline-offset-4">أنشئ حسابًا</a>
-                        لتُملأ بياناتك تلقائيًا في كل طلب.
-                    </p>
-                @endguest
+                @include('components.checkout.address-choice')
 
-                @if ($this->addresses->isNotEmpty())
-                    <fieldset class="space-y-3 rounded-lg border border-line p-5">
-                        <legend class="px-1 text-lg font-extrabold">عنوان الشحن</legend>
+                @include('components.checkout.delivery-form')
 
-                        @foreach ($this->addresses as $address)
-                            <label wire:key="choice-{{ $address->id }}" class="block cursor-pointer">
-                                <input type="radio" wire:model.live="addressChoice" value="{{ $address->id }}" class="peer sr-only">
-                                <span class="block rounded-md border border-line p-4 text-sm peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-500">
-                                    <span class="font-bold">
-                                        {{ $address->label ?: 'عنوان' }}
-                                        @if ($address->is_default)
-                                            <span class="ms-1 rounded-sm bg-brand-700 px-1.5 py-0.5 text-xs text-white">افتراضي</span>
-                                        @endif
-                                    </span>
-                                    <span class="block text-ink-soft">{{ $address->recipient_name }} — {{ $address->city }}، {{ $address->address_line }}</span>
-                                </span>
-                            </label>
-                        @endforeach
+                @include('components.checkout.location-form')
 
-                        <label class="block cursor-pointer">
-                            <input type="radio" wire:model.live="addressChoice" value="" class="peer sr-only">
-                            <span class="block rounded-md border border-line p-4 text-sm font-bold peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-500">
-                                + عنوان آخر
-                            </span>
-                        </label>
-                    </fieldset>
-                @endif
-
-                <section class="space-y-4 rounded-lg border border-line p-5" aria-labelledby="delivery-heading">
-                    <h2 id="delivery-heading" class="text-lg font-extrabold">بيانات الاستلام</h2>
-                    @if ($this->addresses->isNotEmpty())
-                        <p class="text-sm text-ink-soft">يمكنك تعديل أي بيانات لهذا الطلب دون تغيير عنوانك المحفوظ.</p>
-                    @endif
-
-                    <x-store.field name="form.recipient_name" label="الاسم الكامل" required autocomplete="name"
-                                   wire:model.blur="form.recipient_name" />
-
-                    <x-store.field name="form.phone" label="رقم الجوال" required type="tel" inputmode="tel" dir="ltr"
-                                   placeholder="777123456" autocomplete="tel"
-                                   helper="سنتواصل معك على هذا الرقم لتأكيد الطلب." wire:model.blur="form.phone" />
-
-                    <x-store.field name="email" label="البريد الإلكتروني" type="email" dir="ltr"
-                                   autocomplete="email" wire:model.blur="email" />
-
-                    <x-store.field name="form.city" label="المدينة" required autocomplete="address-level2"
-                                   wire:model.blur="form.city" />
-
-                    <x-store.field name="form.address_line" as="textarea" label="العنوان بالتفصيل" required
-                                   placeholder="الحي، الشارع، أقرب معلم..." autocomplete="street-address"
-                                   wire:model.blur="form.address_line" />
-
-                    <x-store.field name="form.notes" as="textarea" label="ملاحظات للتوصيل" wire:model.blur="form.notes" />
-                </section>
-
-                <section class="space-y-3 rounded-lg border border-line p-5" aria-labelledby="location-heading">
-                    <h2 id="location-heading" class="text-lg font-extrabold">موقعك على الخريطة <span class="text-sm font-normal text-ink-soft">(اختياري)</span></h2>
-                    <p class="text-sm text-ink-soft">يساعد المندوب في الوصول إليك بسرعة.</p>
-
-                    <x-store.location-field model="form.location_url" />
-                </section>
-
-                @auth
-                    @if ($addressChoice === '')
-                        <label class="flex items-center gap-2 text-sm">
-                            <input type="checkbox" wire:model="saveAddress" class="size-4 rounded border-line accent-brand-600">
-                            احفظ هذا العنوان في حسابي لأستخدمه في طلباتي القادمة
-                        </label>
-                    @endif
-                @endauth
-
-                <section class="space-y-3 rounded-lg border border-line p-5" aria-labelledby="payment-heading">
-                    <h2 id="payment-heading" class="text-lg font-extrabold">طريقة الدفع</h2>
-                    <div class="flex items-center gap-3 rounded-md border-2 border-brand-600 bg-brand-50 p-4">
-                        <x-lucide-banknote class="size-6 shrink-0 text-brand-700" aria-hidden="true" />
-                        <div>
-                            <p class="font-bold">الدفع عند الاستلام</p>
-                            <p class="text-sm text-ink-soft">ادفع نقدًا عند استلام طلبك.</p>
-                        </div>
-                    </div>
-                </section>
+                @include('components.checkout.payment')
             </div>
 
-            <aside class="space-y-4 rounded-lg border border-line bg-surface p-5 lg:sticky lg:top-24" aria-labelledby="summary-heading">
-                <h2 id="summary-heading" class="text-lg font-extrabold">ملخص الطلب</h2>
-
-                <ul class="divide-y divide-line text-sm">
-                    @foreach ($summary->lines as $line)
-                        <li class="flex justify-between gap-3 py-2">
-                            <span class="min-w-0">
-                                <span class="block font-semibold">{{ $line['variant']->product->name }}</span>
-                                <span class="text-xs text-ink-soft">{{ $line['variant']->color }} / {{ $line['variant']->size }} × {{ $line['quantity'] }}</span>
-                            </span>
-                            <span class="whitespace-nowrap font-semibold">{{ \App\Support\Money::formatMinor($line['line_minor'], $currency) }}</span>
-                        </li>
-                    @endforeach
-                </ul>
-
-                <x-store.totals :subtotal="$summary->subtotalMinor"
-                                :tax="$summary->taxEnabled ? $summary->taxMinor : null" :tax-rate="$summary->taxRate"
-                                :delivery="$summary->deliveryFeeMinor" :total="$summary->totalMinor" :currency="$currency" />
-
-                @error('checkout')
-                    <p class="rounded-md border border-danger/30 bg-white px-3 py-2 text-sm font-semibold text-danger" role="alert">{{ $message }}</p>
-                @enderror
-
-                @if ($summary->hasBlockingIssues())
-                    <p class="rounded-md border border-danger/30 bg-white px-3 py-2 text-sm font-semibold text-danger" role="alert">
-                        بعض العناصر لم تعد متاحة.
-                        <a href="{{ route('cart') }}" wire:navigate class="underline">راجع السلة</a>
-                    </p>
-                @endif
-
-                <button type="submit" wire:loading.attr="disabled" wire:target="placeOrder"
-                        @disabled($summary->hasBlockingIssues())
-                        class="w-full rounded-md bg-brand-600 px-6 py-3.5 text-base font-extrabold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-ink-soft/40">
-                    <span wire:loading.remove wire:target="placeOrder">تأكيد الطلب</span>
-                    <span wire:loading wire:target="placeOrder">جارٍ إرسال الطلب…</span>
-                </button>
-
-                <p class="text-xs text-ink-soft">
-                    بتأكيد الطلب توافق على حفظ بياناتك لتنفيذ طلبك والتواصل معك بشأنه.
-                </p>
-            </aside>
+            @include('components.checkout.summary')
         </form>
     @endif
 </div>

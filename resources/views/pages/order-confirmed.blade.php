@@ -99,7 +99,7 @@ public function currency(): string
             @endforeach
         </ul>
 
-        <x-store.totals :subtotal="\App\Support\Money::toMinor($order->subtotal)"
+        <x-cart.totals :subtotal="\App\Support\Money::toMinor($order->subtotal)"
                         :tax="\App\Support\Money::toMinor($order->tax_rate) > 0 ? \App\Support\Money::toMinor($order->tax_amount) : null"
                         :tax-rate="$order->tax_rate"
                         :delivery="\App\Support\Money::toMinor($order->delivery_fee)"

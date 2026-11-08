@@ -84,7 +84,7 @@ class BranchResource extends Resource
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
             ->columns([
-                ImageColumn::make('image')->label('الصورة')->disk('public'),
+                ImageColumn::make('image')->label('الصورة')->disk('public')->circular(),
                 TextColumn::make('name')->label('الفرع')->searchable(),
                 TextColumn::make('city')->label('المدينة'),
                 TextColumn::make('phone')->label('الهاتف'),

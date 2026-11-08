@@ -8,7 +8,7 @@ new #[Title('حسابي')] class extends Component {};
 
 {{-- صفحة الحساب الرئيسية: ترحيب وبطاقات وصول سريع. --}}
 {{-- تُضاف بطاقات الأقسام الجديدة (العناوين، الطلبات، المفضلة) في الخطوات القادمة. --}}
-<x-store.account-shell heading="أهلًا، {{ auth()->user()->name }}">
+<x-account.shell heading="أهلًا، {{ auth()->user()->name }}">
     <ul class="grid gap-4 sm:grid-cols-2">
         <li>
             <a href="{{ route('account.profile') }}" wire:navigate
@@ -47,4 +47,4 @@ new #[Title('حسابي')] class extends Component {};
             </a>
         </li>
     </ul>
-</x-store.account-shell>
+</x-account.shell>

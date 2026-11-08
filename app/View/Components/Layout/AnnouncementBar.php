@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Components\Store;
+namespace App\View\Components\Layout;
 
 use App\Models\StoreSetting;
 use Illuminate\Contracts\View\View;
@@ -30,6 +30,6 @@ class AnnouncementBar extends Component
      */
     public function render(): View|\Closure|string
     {
-        return view('components.store.announcement-bar');
+        return view('components.layout.announcement-bar');
     }
 }

@@ -287,7 +287,7 @@ new class extends Component {
                 <div class="text-center">
                     <p class="text-5xl font-extrabold">{{ number_format($summary['average'], 1) }}</p>
                     <div class="mt-2 flex justify-center">
-                        <x-store.rating-stars :rating="$summary['average']" size="size-6" />
+                        <x-ui.rating-stars :rating="$summary['average']" size="size-6" />
                     </div>
                     <p class="mt-2 text-sm text-ink-soft">من 5 · {{ $summary['count'] }} تقييم</p>
                 </div>
@@ -362,7 +362,7 @@ new class extends Component {
                                         </p>
                                         <p class="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-ink-soft">
                                             <time datetime="{{ $review->created_at->toDateString() }}">{{ $review->created_at->format('Y-m-d') }}</time>
-                                            <x-store.rating-stars :rating="$review->rating" />
+                                            <x-ui.rating-stars :rating="$review->rating" />
                                         </p>
                                     </div>
 

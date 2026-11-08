@@ -27,7 +27,7 @@ new #[Title('طلباتي')] class extends Component {
 
 {{-- قائمة طلبات العميل: رقم الطلب والتاريخ والحالة وملخص الأصناف والإجمالي، وزر التفاصيل. --}}
 {{-- المبالغ تُعرض بعملة الطلب نفسه وقت الشراء. --}}
-<x-store.account-shell heading="طلباتي">
+<x-account.shell heading="طلباتي">
     <ul class="space-y-4">
         @forelse ($this->orders as $order)
             @php
@@ -39,7 +39,7 @@ new #[Title('طلباتي')] class extends Component {
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <a href="{{ route('account.orders.show', ['number' => $order->order_number]) }}" wire:navigate
                        class="font-extrabold text-brand-700 hover:underline" dir="ltr">{{ $order->order_number }}</a>
-                    <x-store.order-badge :status="$order->status" />
+                    <x-account.order-badge :status="$order->status" />
                 </div>
 
                 <p class="mt-1 text-xs text-ink-soft">{{ $order->created_at->translatedFormat('j F Y، h:i A') }}</p>
@@ -66,4 +66,4 @@ new #[Title('طلباتي')] class extends Component {
     </ul>
 
     <div class="mt-6">{{ $this->orders->links() }}</div>
-</x-store.account-shell>
+</x-account.shell>
